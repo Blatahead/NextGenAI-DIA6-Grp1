@@ -16,6 +16,7 @@ Allocation, quota counters and commands actually run. Counted separately: initia
 
 | Time (Paris) | Operator | Command | Result (cells done / errors) |
 |---|---|---|---|
+| 15:00|B (Jean-Walter) | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-20b --cases C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20 --state state-B.jsonl --out traces-B.csv` | 20 cells done / 2 temporary errors (HTTP 429 sur C19 et C20, résolues par retry) |
 | 14:46 | C | `python skeleton-multi-llm-en.py --run --models openrouter:cohere/north-mini-code:free --cases C01,C03 --state state-C.jsonl --out traces-C.csv` | 2/2 cells, 2 correct, no error |
 | 14:46–14:48 | C | `python skeleton-multi-llm-en.py --run --models openrouter:cohere/north-mini-code:free --state state-C.jsonl --out traces-C.csv` | 18 new cells (C01, C03 skipped): 20/20 done, 11 correct, 8 incorrect, 1 sql_invalid (C02); all HTTP 200 |
 | 14:47 to 14:49 | D | `python skeleton-multi-llm-en.py --run --models groq:qwen/qwen3.8-27b --state state-D.jsonl --out traces-D.csv` | 20 cells done: 13 correct, 5 incorrect, 1 sql_rejected, 1 not_executed; 6 x HTTP 429 (see Incidents). Files: `state-D.jsonl`, `traces-D.csv` |
@@ -27,7 +28,7 @@ Allocation, quota counters and commands actually run. Counted separately: initia
 | Operator | Initial calls | Retries | Access checks | Remaining allowance after | Reallocated / fallback cells |
 |---|---|---|---|---|---|
 | A | | | | | |
-| B | | | | | |
+| B | 20| 2|1 |25 API calls |0 |
 | C | 20 | 0 | 0 today | 30/50 free-model requests today, $0 spent | none |
 | D | 20 | 5 | 3 Groq (20 Oct) | _TO FILL_ | C18 (HTTP 429 twice): instructor fallback requested |
 | E | 20 | 0 | 0 during TD 1 | 30/50 free-model requests for 21 Oct (20 used, all by this run; resets at 00:00 UTC). Evidence: `notes/openrouter-activity-E-2026-10-21.csv` | none |
