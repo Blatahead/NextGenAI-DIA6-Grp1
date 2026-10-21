@@ -1,0 +1,21 @@
+generation_id,created_at,cost_total,cost_web_search,cost_cache,cost_file_processing,byok_usage_inference,tokens_prompt,tokens_completion,tokens_reasoning,tokens_cached,model_permaslug,provider_name,variant,cancelled,streamed,user,finish_reason_raw,finish_reason_normalized,generation_time_ms,time_to_first_token_ms,app_name,api_key_name,api_key_disabled
+gen-1792587381-SyebJnIDo0vzGcDzNrLR,2026-10-21 12:56:21.821,0,,,,0,593,92,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2407,951,,Default key,false
+gen-1792587374-cHIKxbaOdYtkVNsKMLL4,2026-10-21 12:56:14.302,0,,,,0,622,280,0,0,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,3847,561,,Default key,false
+gen-1792587368-gFpudGqRuDoCbVk5Dc1R,2026-10-21 12:56:08.510,0,,,,0,609,137,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2497,846,,Default key,false
+gen-1792587361-LqZWBuqvGzOIX7bZzmU6,2026-10-21 12:56:01.482,0,,,,0,626,227,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,3826,923,,Default key,false
+gen-1792587354-tqrMbz3wBd5GlD3YBiof,2026-10-21 12:55:54.752,0,,,,0,583,233,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,3516,799,,Default key,false
+gen-1792587347-n5hspTujFSUecDkDlV0z,2026-10-21 12:55:47.213,0,,,,0,618,336,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,4362,797,,Default key,false
+gen-1792587341-eUVHF8BGgp0zSBmdAHVX,2026-10-21 12:55:41.625,0,,,,0,601,108,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2256,866,,Default key,false
+gen-1792587336-t7UUsInwQaAcRTHl6lj2,2026-10-21 12:55:36.263,0,,,,0,599,105,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2122,834,,Default key,false
+gen-1792587331-OnGjpn2e4sv50h0MmVrb,2026-10-21 12:55:31.389,0,,,,0,560,56,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,1705,840,,Default key,false
+gen-1792587325-EQrRyzo5XoWc6Lx6KvDL,2026-10-21 12:55:25.617,0,,,,0,578,121,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2417,924,,Default key,false
+gen-1792587318-OWHOO6IilcTHz55eHFiz,2026-10-21 12:55:18.371,0,,,,0,568,272,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,3986,1081,,Default key,false
+gen-1792587311-BmS4UnxvJ0AjRFb2iieA,2026-10-21 12:55:11.527,0,,,,0,578,249,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,3461,832,,Default key,false
+gen-1792587303-mxidqQzLEti6c5pnHIdb,2026-10-21 12:55:03.758,0,,,,0,578,342,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,4619,796,,Default key,false
+gen-1792587298-CIIs3rZlKvVp23o6UNxH,2026-10-21 12:54:58.427,0,,,,0,593,92,0,0,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2091,918,,Default key,false
+gen-1792587292-TNMP695nM5lIX2jNSdy9,2026-10-21 12:54:52.988,0,,,,0,593,92,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2082,948,,Default key,false
+gen-1792587287-XTcwl3DU4RnARRFOapSk,2026-10-21 12:54:47.086,0,,,,0,593,92,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2642,1203,,Default key,false
+gen-1792587281-cEMrKYwOUQqDNKFcyIvW,2026-10-21 12:54:41.908,0,,,,0,594,92,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,1848,921,,Default key,false
+gen-1792587276-hh6M4AGvSPrrspnfouxW,2026-10-21 12:54:36.034,0,,,,0,601,108,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,2582,881,,Default key,false
+gen-1792587268-EJFqLz3yGn0o9hS7FBTT,2026-10-21 12:54:28.853,0,,,,0,578,191,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,3898,1264,,Default key,false
+gen-1792587263-oR9n36eLoU9w3dPuwdFo,2026-10-21 12:54:23.628,0,,,,0,593,92,0,512,dots-studio/dots-3-note-preview-20260813,AtlasCloud,free,false,true,,stop,stop,1869,805,,Default key,false
