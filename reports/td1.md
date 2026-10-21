@@ -29,7 +29,7 @@ B is not counted as executed or graded. The known batches therefore account for 
 
 ### Artifacts and cross-checks
 
-Available artifacts include `traces-A.csv`, `portefeuille-modeles-2026-09-28.csv`, `enonce-td1-en.md`, and the supplied five-model summary template. The A trace artifact contains 20 real rows and the earlier A result is 20/20 correct. C/D/E cell-level SQL, HTTP, and error details were not supplied in the current evidence; wrong-answer examples should therefore be taken from the corresponding comparison files once those are available.
+Available artifacts include `traces/traces-A.csv`, `portefeuille-modeles-2026-09-28.csv`, `enonce-td1-en.md`, and the supplied five-model summary template. The A trace artifact contains 20 real rows and the earlier A result is 20/20 correct. C/D/E cell-level SQL, HTTP, and error details were not supplied in the current evidence; wrong-answer examples should therefore be taken from the corresponding comparison files once those are available.
 
 The report should be cross-checked against:
 
@@ -101,7 +101,7 @@ Member-level contributions, the F/G cross-check roles, and the division of work 
 
 ## 9. Evidence inventory
 
-- `traces-A.csv` — available source trace; 20 real A rows, each correct in the available artifact.
+- `traces/traces-A.csv` — available source trace; 20 real A rows, each correct in the available artifact.
 - `enonce-td1-en.md` — assignment protocol and A command shown above.
 - `portefeuille-modeles-2026-09-28.csv` — portfolio source for route, price, and public-index cross-checks.
 - `model-question-comparison-en.csv` — required final comparison artifact; use it for cell-level cross-checks.

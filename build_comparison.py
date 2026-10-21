@@ -21,7 +21,7 @@ TARGET = "model-question-comparison-en.csv"
 
 
 def build(letter: str, show: bool) -> None:
-    source = f"traces-{letter}.csv"
+    source = f"traces/traces-{letter}.csv"
     with open(source, encoding="utf-8", newline="") as stream:
         rows = list(csv.DictReader(stream))
     last = {}
