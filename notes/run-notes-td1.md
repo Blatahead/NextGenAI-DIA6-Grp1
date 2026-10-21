@@ -9,7 +9,7 @@ Allocation, quota counters and commands actually run. Counted separately: initia
 | A |Noé| `groq:openai/gpt-oss-120b` | Groq | | 3 Groq + 2 OR per run | 20 | 5 |
 | B | Jean-Walter| `groq:openai/gpt-oss-20b` | Groq | | | 20 | 5 |
 | C | Benjamin| `openrouter:cohere/north-mini-code:free` | OpenRouter (account 1) | | | 20 | 5 |
-| D | Emma et Bart| `groq:qwen/qwen3.8-27b` | Groq | _TO FILL (read in the Groq console)_ | 3 Groq (one `check_access` run, 20 Oct) | 20 | 5 |
+| D | Emma et Bart| `groq:qwen/qwen3.8-27b` | Groq | 80K tokens | 3 Groq (one `check_access` run, 20 Oct) | 20 | 5 |
 | E | Antonin| `openrouter:dots-studio/dots-3-note-preview:free` | OpenRouter (account 2, ≠ C) | | | 20 | 5 |
 
 ## Commands run
@@ -26,7 +26,7 @@ Allocation, quota counters and commands actually run. Counted separately: initia
 | A | | | | | |
 | B | | | | | |
 | C | | | | | |
-| D | 20 | 5 | 3 Groq (20 Oct) | _TO FILL_ | C18 (HTTP 429 twice): instructor fallback requested |
+| D | 20 | 5 | 3 Groq (20 Oct) | 65,5K tokens | C18 (HTTP 429 twice): instructor fallback requested |
 | E | | | | | |
 
 ## Incidents
