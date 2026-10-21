@@ -1,0 +1,21 @@
+case_id,model_id,trace_file,cell_id,nature,status,value_cents,reference_cents,explanation
+C01,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C01,real,correct,792800,792800,Correct on the first attempt (last attempt 1).
+C02,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C02,real,correct,590320,590320,Correct on the first attempt (last attempt 1).
+C03,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C03,real,correct,936350,936350,Correct on the first attempt (last attempt 1).
+C04,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C04,real,correct,2826250,2826250,Correct on the first attempt (last attempt 1).
+C05,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C05,real,correct,38480,38480,Correct on the first attempt (last attempt 1).
+C06,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C06,real,correct,0,0,Correct on the first attempt (last attempt 1).
+C07,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C07,real,correct,13970,13970,Correct on the first attempt (last attempt 1).
+C08,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C08,real,correct,605580,605580,Correct on the first attempt (last attempt 1).
+C09,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C09,real,incorrect,0,487980,"Observed: SQL never uses the reference date 2026-09-26; age is computed from the order date (o.date) with year difference, value 0. Convention broken: age on the reference date. Last attempt 1."
+C10,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C10,real,incorrect,119410,558980,"Observed: age at order time via year difference and month-day, but second branch tests year difference = 24 where 26 is needed (birthday not yet reached). Hypothesis: arithmetic slip in the age condition. Last attempt 1."
+C11,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C11,real,correct,446690,446690,Correct on the first attempt (last attempt 1).
+C12,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C12,real,correct,1666490,1666490,Correct on the first attempt (last attempt 1).
+C13,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C13,real,correct,107740,107740,Correct on the first attempt (last attempt 1).
+C14,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C14,real,correct,0,0,Correct on the first attempt (last attempt 1).
+C15,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C15,real,incorrect,138920,168680,"Observed: for birthdays after 09-25 the query keeps birth+24 years = 2026, i.e. 24-year-olds, instead of birth year 2000. Hypothesis: off-by-two slip in the completed-age logic. Last attempt 1."
+C16,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C16,real,incorrect,367050,376740,"Observed: birth years hard-coded (2001 if month-day < 09-25, 2000 if >= 09-25). This drops the customer born 2001-09-25 (25 on the reference date, 80190 cents of a/b/c) and wrongly keeps the one born 2000-09-25 (26, 70500 cents): net -9690, exactly the gap (verified on the database). Last attempt 2; attempt 1 got HTTP 429 (OTPM limit), attempt 2 executed."
+C17,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C17,real,incorrect,248490,258180,"Same boundary error as C16: net -9690 (80190 excluded, 70500 wrongly included), exactly the gap, verified on the database. Last attempt 2; attempt 1 got HTTP 429 (OTPM limit), attempt 2 executed."
+C18,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C18,real,not_executed,,62480,"Not executed: attempts 1 and 2 both HTTP 429 (output tokens per minute, limit 1000); maximum attempts reached, no SQL produced. Access/rate-limit failure, not a wrong answer. Fallback to request from the instructor."
+C19,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C19,real,sql_rejected,,1990,"Observed: attempt 2 returned HTTP 200 but the stored SQL starts with a ```sql fence and has no closing fence, so the sandbox rejected it as not_select; the SQL also compares strftime('%Y',...) with the date string '2026-09-25'. Hypothesis: the model omitted the closing fence (raw reply not stored). Last attempt 2; attempt 1 got HTTP 429."
+C20,groq:qwen/qwen3.8-27b,traces-D.csv,groq:qwen/qwen3.8-27b:C20,real,correct,1106090,1106090,Correct on attempt 2; attempt 1 got HTTP 429 (OTPM limit).
