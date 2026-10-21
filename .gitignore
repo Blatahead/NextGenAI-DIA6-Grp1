@@ -22,3 +22,7 @@ __pycache__/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Simulated demo outputs (never part of a real count)
+traces-demo.csv
+traces-demo.jsonl
