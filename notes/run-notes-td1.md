@@ -8,8 +8,8 @@ Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc
 
 | Operator | Member | Model | Account | Remaining allowance before run | `check_access` calls already used | Cells assigned | Margin reserved |
 |---|---|---|---|---|---|---|---|
-| A | Noé | `groq:openai/gpt-oss-120b` | Groq | _to fill (Noé): value read in the Groq console; the notes gave 28 and 1000, to confirm_ | _to fill (Noé): number of runs and date (each run = 3 Groq + 2 OR)_ | 20 | 5 |
-| B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | _to fill (Jean-Walter): value read in the Groq console_ | 1 run (3 Groq + 2 OR), _date to fill (Jean-Walter)_ | 20 | 5 |
+| A | Noé | `groq:openai/gpt-oss-120b` | Groq | Fresh Key created 21 Oct (0 calls used) |1 run on 21 Oct (3 Groq+2OR) | 20 | 5 |
+| B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | Fresh Key created 21 Oct (0 calls used) | 1 run (3 Groq + 2 OR) on 21 Oct | 20 | 5 |
 | C | Benjamin | `openrouter:cohere/north-mini-code:free` | OpenRouter (account 1) | 50/50 free-model requests for 21 Oct (`/api/v1/key`, 14:45, free tier, $0 spent) | 1 run on 16 Oct (3 Groq + 2 OR), none on 21 Oct | 20 | 5 |
 | D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | _to fill (Emma, Bart): value read in the Groq console_ | 1 run on 20 Oct (3 Groq) | 20 | 5 |
 | E | Antonin | `openrouter:dots-studio/dots-3-note-preview:free` | OpenRouter (account 2, ≠ C) | 50/50 free-model requests for 21 Oct (OpenRouter Activity, limit 50/day without purchased credits) | 1 run on 20 Oct (3 Groq + 2 OR); an earlier run that day stopped before any call (missing keys) | 20 | 5 |
@@ -25,14 +25,14 @@ Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc
 | ~14:50 | E | `python skeleton-multi-llm-en.py --run --models openrouter:dots-studio/dots-3-note-preview:free --state state-E.jsonl --out traces-E.csv` | Stopped before any call: CSV fingerprints differ from `data/manifest.json` (incident E1); 0 calls |
 | 14:54–14:56 | E | same command, after restoring `data/` | 20/20 cells: 12 correct, 7 incorrect (C02, C10, C11, C15, C16, C18, C19), 1 sql_invalid (C17); all HTTP 200 |
 | 14:55 | A | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C03 --state state-A.jsonl --out traces-A.csv` | 2/2 cells: 2 correct; all HTTP 200 |
-| 14:55–14:57 | A | _to fill (Noé): literal command of the second run (same `--state state-A.jsonl --out traces-A.csv`)_ | 18 new cells (C01, C03 skipped), 20/20 in total: 20 correct; all HTTP 200 |
+| 14:55–14:57 | A | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20 --state state-A.jsonl --out traces-A.csv` | 18 new cells (C01, C03 skipped), 20/20 in total: 20 correct; all HTTP 200 |
 
 ## Counters after the batch
 
 | Operator | Initial calls | Retries | Access checks | Remaining allowance after | Reallocated / fallback cells |
 |---|---|---|---|---|---|
-| A | 20 | 0 | _to fill (Noé)_ | _to fill (Noé): value read in the Groq console_ | none |
-| B | 20 | 2 (C19, C20) | 1 run (3 Groq + 2 OR), _date to fill (Jean-Walter)_ | _to fill (Jean-Walter): value read in the Groq console_ | none |
+| A | 20 | 0 |1 run (3 Groq + 2 OR) on 21 Oct | Free Tier Active, 25 total API calls recorded on 21 Oct | none |
+| B | 20 | 2 (C19, C20) | 1 run (3 Groq + 2 OR) on 21 Oct | Free Tier Active, 25 total API calls recorded on 21 Oct | none |
 | C | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent | none |
 | D | 20 | 5 (C16, C17, C18, C19, C20) | 1 run on 20 Oct (3 Groq) | _to fill (Emma, Bart): value read in the Groq console_ | C18 `not_executed` (HTTP 429 twice): instructor fallback requested, not used so far |
 | E | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent (resets at 00:00 UTC; evidence `notes/openrouter-activity-E-2026-10-21.csv`) | none |
