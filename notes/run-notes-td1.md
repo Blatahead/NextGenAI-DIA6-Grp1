@@ -16,14 +16,14 @@ Allocation, quota counters and commands actually run. Counted separately: initia
 
 | Time (Paris) | Operator | Command | Result (cells done / errors) |
 |---|---|---|---|
-| | | | |
+| 15:00|B (Jean-Walter) | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-20b --cases C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20 --state state-B.jsonl --out traces-B.csv` | 20 cells done / 2 temporary errors (HTTP 429 sur C19 et C20, résolues par retry) |
 
 ## Counters after the batch
 
 | Operator | Initial calls | Retries | Access checks | Remaining allowance after | Reallocated / fallback cells |
 |---|---|---|---|---|---|
 | A | | | | | |
-| B | | | | | |
+| B | 20| 2|1 |25 API calls |0 |
 | C | | | | | |
 | D | | | | | |
 | E | | | | | |
