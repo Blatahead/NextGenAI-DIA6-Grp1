@@ -1,0 +1,5 @@
+# Keep the kit data byte-identical: their SHA-256 are checked against data/manifest.json
+# (check_access.py, verify-data.py, skeleton --run). No line-ending conversion.
+data/** -text
+*.sqlite binary
+schema.sql -text

@@ -1,1 +1,21 @@
 case_id,model_id,trace_file,cell_id,nature,status,value_cents,reference_cents,explanation
+C01,groq:openai/gpt-oss-20b,traces-B.csv,B-C01,real,correct,792800,792800,
+"C02,groq:openai/gpt-oss-20b,traces-B.csv,B-C02,real,incorrect,0,590320,""Wrong age window: for age 25 on 2026-09-25 the birth_date must be in ('2000-09-25','2001-09-25'], but the model subtracted 1 year instead of 25 and filtered birth_date > '2025-09-25' AND <= '2026-09-25' (customers aged 0), so no customer matched and the sum is 0."""
+C03,groq:openai/gpt-oss-20b,traces-B.csv,B-C03,real,correct,936350,936350,
+C04,groq:openai/gpt-oss-20b,traces-B.csv,B-C04,real,correct,2826250,2826250,
+C05,groq:openai/gpt-oss-20b,traces-B.csv,B-C05,real,correct,38480,38480,
+C06,groq:openai/gpt-oss-20b,traces-B.csv,B-C06,real,correct,0,0,
+C07,groq:openai/gpt-oss-20b,traces-B.csv,B-C07,real,correct,13970,13970,
+C08,groq:openai/gpt-oss-20b,traces-B.csv,B-C08,real,correct,605580,605580,
+C09,groq:openai/gpt-oss-20b,traces-B.csv,B-C09,real,correct,487980,487980,
+C10,groq:openai/gpt-oss-20b,traces-B.csv,B-C10,real,correct,558980,558980,
+"C11,groq:openai/gpt-oss-20b,traces-B.csv,B-C11,real,incorrect,322160,446690,""Wrong age window: for age 25 on 2026-12-01 the birth_date must be in ('2000-12-01','2001-12-01'], but the model filtered birth_date > '2001-12-01' AND <= '2006-12-01', a 5-year range selecting customers aged 20-24 and excluding those exactly 25."""
+C12,groq:openai/gpt-oss-20b,traces-B.csv,B-C12,real,correct,1666490,1666490,
+C13,groq:openai/gpt-oss-20b,traces-B.csv,B-C13,real,correct,107740,107740,
+C14,groq:openai/gpt-oss-20b,traces-B.csv,B-C14,real,correct,0,0,
+C15,groq:openai/gpt-oss-20b,traces-B.csv,B-C15,real,correct,168680,168680,
+C16,groq:openai/gpt-oss-20b,traces-B.csv,B-C16,real,correct,376740,376740,
+C17,groq:openai/gpt-oss-20b,traces-B.csv,B-C17,real,correct,258180,258180,
+C18,groq:openai/gpt-oss-20b,traces-B.csv,B-C18,real,correct,62480,62480,
+C19,groq:openai/gpt-oss-20b,traces-B.csv,B-C19,real,correct,1990,1990,Success after retry
+C20,groq:openai/gpt-oss-20b,traces-B.csv,B-C20,real,correct,1106090,1106090,Success after retry

@@ -1,126 +1,85 @@
-# TD1 run notes — updated
+# TD 1 run notes
 
-> Compact operational record. Values marked **unverified**, **unknown**, or **not supplied** are intentionally not inferred.
+Allocation, quota counters and commands actually run. Counted separately: initial calls (base batch), access checks, retries. A new key adds no capacity.
 
-## 1. Batch ledger
+Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc` column of each trace when available; counts come from the raw traces (`traces-X.csv`). A value that no trace or console records is marked _to fill (name)_ and is not guessed.
 
-| Batch | Assigned model / route | Final cells | Result | Allowance / access notes |
-|---|---|---:|---|---|
-| A | `groq:openai/gpt-oss-120b` | 20 | 20 correct | Notes table reportedly says 28 remaining; another narrative says 1000 remaining and 20 calls. **Unverified / reconcile.** |
-| B | `groq:openai/gpt-oss-20b` | 20 | Unknown; pending | Unknown |
-| C | `openrouter:cohere/north-mini-code:free` | 20 | 11 correct, 8 incorrect, 1 `sql_invalid` | 50/50 before; 30/50 after |
-| D | Qwen / Groq | 20 final cells | 13 correct, 5 incorrect, 1 `sql_rejected`, 1 `not_executed` | Allowance fields missing |
-| E | `openrouter:dots-studio/dots-3-note-preview:free` | 20 | All HTTP 200; 12 correct, 7 incorrect, 1 `sql_invalid` | 50/day, 0 before; 30/50 after |
+## Allocation and allowance (filled at 14:00–14:15)
 
-Known final-cell coverage: **80 of 100** (A, C, D, E). B remains pending/unknown.
+| Operator | Member | Model | Account | Remaining allowance before run | `check_access` calls already used | Cells assigned | Margin reserved |
+|---|---|---|---|---|---|---|---|
+| A | Noé | `groq:openai/gpt-oss-120b` | Groq | _to fill (Noé): value read in the Groq console; the notes gave 28 and 1000, to confirm_ | _to fill (Noé): number of runs and date (each run = 3 Groq + 2 OR)_ | 20 | 5 |
+| B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | _to fill (Jean-Walter): value read in the Groq console_ | 1 run (3 Groq + 2 OR), _date to fill (Jean-Walter)_ | 20 | 5 |
+| C | Benjamin | `openrouter:cohere/north-mini-code:free` | OpenRouter (account 1) | 50/50 free-model requests for 21 Oct (`/api/v1/key`, 14:45, free tier, $0 spent) | 1 run on 16 Oct (3 Groq + 2 OR), none on 21 Oct | 20 | 5 |
+| D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | _to fill (Emma, Bart): value read in the Groq console_ | 1 run on 20 Oct (3 Groq) | 20 | 5 |
+| E | Antonin | `openrouter:dots-studio/dots-3-note-preview:free` | OpenRouter (account 2, ≠ C) | 50/50 free-model requests for 21 Oct (OpenRouter Activity, limit 50/day without purchased credits) | 1 run on 20 Oct (3 Groq + 2 OR); an earlier run that day stopped before any call (missing keys) | 20 | 5 |
 
-## 2. Commands
+## Commands run
 
-### A — supplied command
+| Time (Paris) | Operator | Command | Result (cells done / errors) |
+|---|---|---|---|
+| 14:46 | C | `python skeleton-multi-llm-en.py --run --models openrouter:cohere/north-mini-code:free --cases C01,C03 --state state-C.jsonl --out traces-C.csv` | 2/2 cells: 2 correct; all HTTP 200 |
+| 14:46–14:48 | C | `python skeleton-multi-llm-en.py --run --models openrouter:cohere/north-mini-code:free --state state-C.jsonl --out traces-C.csv` | 18 new cells (C01, C03 skipped), 20/20 in total: 11 correct, 8 incorrect, 1 sql_invalid (C02); all HTTP 200 |
+| 14:47–14:49 | D | `python skeleton-multi-llm-en.py --run --models groq:qwen/qwen3.8-27b --state state-D.jsonl --out traces-D.csv` | 20/20 cells, 25 attempts: 13 correct, 5 incorrect, 1 sql_rejected (C19), 1 not_executed (C18); 6 × HTTP 429 (incident D1) |
+| 14:49–14:51 | B | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-20b --cases C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20 --state state-B.jsonl --out traces-B.csv` | 20/20 cells, 22 attempts: 18 correct, 2 incorrect (C02, C11); 2 × HTTP 429 on C19 and C20, both solved by the retry (incident B1) |
+| ~14:50 | E | `python skeleton-multi-llm-en.py --run --models openrouter:dots-studio/dots-3-note-preview:free --state state-E.jsonl --out traces-E.csv` | Stopped before any call: CSV fingerprints differ from `data/manifest.json` (incident E1); 0 calls |
+| 14:54–14:56 | E | same command, after restoring `data/` | 20/20 cells: 12 correct, 7 incorrect (C02, C10, C11, C15, C16, C18, C19), 1 sql_invalid (C17); all HTTP 200 |
+| 14:55 | A | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C03 --state state-A.jsonl --out traces-A.csv` | 2/2 cells: 2 correct; all HTTP 200 |
+| 14:55–14:57 | A | _to fill (Noé): literal command of the second run (same `--state state-A.jsonl --out traces-A.csv`)_ | 18 new cells (C01, C03 skipped), 20/20 in total: 20 correct; all HTTP 200 |
 
-```bash
-python3 skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C03 --state state-A.jsonl --out traces-A.csv
-```
+## Counters after the batch
 
-The notes describe a second A invocation covering all 20 cases with the same state. Its literal command is not present in the current supplied evidence. Recover it from the shell history/run log rather than reconstructing it.
+| Operator | Initial calls | Retries | Access checks | Remaining allowance after | Reallocated / fallback cells |
+|---|---|---|---|---|---|
+| A | 20 | 0 | _to fill (Noé)_ | _to fill (Noé): value read in the Groq console_ | none |
+| B | 20 | 2 (C19, C20) | 1 run (3 Groq + 2 OR), _date to fill (Jean-Walter)_ | _to fill (Jean-Walter): value read in the Groq console_ | none |
+| C | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent | none |
+| D | 20 | 5 (C16, C17, C18, C19, C20) | 1 run on 20 Oct (3 Groq) | _to fill (Emma, Bart): value read in the Groq console_ | C18 `not_executed` (HTTP 429 twice): instructor fallback requested, not used so far |
+| E | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent (resets at 00:00 UTC; evidence `notes/openrouter-activity-E-2026-10-21.csv`) | none |
+| **Total** | **100** | **7** | counted per operator above | | **1 cell (D, C18)** |
 
-### C — command text not supplied in current evidence
+Total HTTP attempts on 21 Oct: 107 (100 initial calls + 7 retries). Traces: A 20 rows, B 22, C 20, D 25, E 20. Note: the notes once gave 22 initial calls for A; the trace shows 20 calls in two runs (C01 and C03 first, then the 18 others), so 22 was a count of runs plus calls, not of calls.
 
-```text
-[INSERT literal C command from run log; do not infer]
-```
+Operator E account history (OpenRouter Activity, past month): 22 requests in total, $0.00 spent: 2 on 20 Oct (`check_access.py`: one North Mini Code, one Dots) and 20 on 21 Oct (this batch, provider AtlasCloud, variant `free`, `finish_reason` = `stop` on all 20).
 
-### D — command text not supplied in current evidence
+## Incidents
 
-```text
-[INSERT literal D command from run log; do not infer]
-```
+_HTTP status, `Retry-After`, timeouts, reallocations, fallback data used (label: historical real / replay / simulated)._
 
-### E — command text not supplied in current evidence
+### A — no incident
 
-Initial preflight:
+20 attempts, all HTTP 200, no 429, no timeout, no retry; 20/20 correct. Traces: `state-A.jsonl`, `traces-A.csv` (nature `real`).
 
-```text
-[INSERT literal E initial command from run log; the preflight failed fingerprint/integrity validation and made 0 API calls]
-```
+### B1 — HTTP 429 on tokens per minute (operator B, 14:50–14:51)
 
-Rerun:
+- **Observed:** first attempt of C19 (12:50:49 UTC) and C20 (12:50:56 UTC) refused with HTTP 429 "Rate limit reached for model `openai/gpt-oss-20b` ... on tokens per minute (TPM): Limit 8000" (used 6807 + requested 1344 for C19, used 6975 + requested 1052 for C20).
+- **Retry:** one retry each, a few seconds later, HTTP 200; final verdict correct for both. `Retry-After` is not stored in the trace.
+- **Impact:** 2 retries out of the 5-call margin; no cell lost. Nature: real. Traces: `state-B.jsonl`, `traces-B.csv`.
 
-```text
-[INSERT literal E rerun command from run log; final batch has 20 cells, all HTTP 200]
-```
+### C — no access incident
 
-## 3. Timing record
+20 attempts, all HTTP 200, no 429, no timeout, no retry. One answer was invalid SQL (C02, `syntax_error near "AS"`): a model error, not an access error. In the console the C14 verdict line was not printed, but `traces-C.csv` contains it (correct, 0 = 0). Traces: `state-C.jsonl`, `traces-C.csv` (nature `real`, one prompt fingerprint per question).
 
-- TD1 session window in the assignment: 21 October, 14:00–18:30.
-- A trace artifact available in the upload is dated 2026-10-21, with displayed row times beginning at 12:55:21 UTC. Use trace timestamps as recorded; do not convert them without a stated timezone.
-- Exact C, D, and E run times were not supplied in the current evidence.
-- E had an initial failed local fingerprint/integrity preflight and a later rerun. The initial attempt made zero API calls.
+### D1 — HTTP 429 on output tokens per minute (operator D, 14:48–14:49)
 
-## 4. Accounting notes
+- **Observed:** HTTP 429 "Rate limit reached ... on output tokens per minute (OTPM): Limit 1000" on C16, C17, C18 (twice), C19 and C20: 6 responses. The first came 53 s after the first call. `Retry-After` is not stored in the trace.
+- **Retry:** the retry worked for C16, C17, C19 and C20 and failed for C18, which stays `not_executed` (maximum of two attempts per cell reached). C19 then returned `sql_rejected` (`not_select`): a model answer, not an access error.
+- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: `notes/model-D-qwen-report.md`, `notes/comparison-rows-D.csv`.
 
-### A: 20 calls versus 22 noted invocations/attempts
+### D2 — Data fingerprints changed by Git line endings (operator D, before the run)
 
-The notes table says A initial calls = 22, but the narrative says the first invocation was `C01,C03`, followed by a second invocation for all 20 with the same state; C01 and C03 were skipped on the second run. Prior transcript reporting gives 20 trace lines and 20 state lines. Record:
+- **Observed:** `check_access` stopped with "csv ... fingerprint differs from manifest.json".
+- **Cause:** Git (`core.autocrlf=true`) changed the line endings of the three CSV copies in `data/`.
+- **Fix:** originals copied back from the kit, check passed again. The SQLite base was never modified (SHA-256 identical to `manifest.json`).
+- **Impact:** no model call consumed.
 
-- **20 unique API calls / final cells** — established for the batch.
-- **22 invocations/attempts** — reported in the notes table but not a valid unique-cell call count; retain as an unverified discrepancy.
+### E1 — Data fingerprints changed by Git line endings (operator E, ~14:50)
 
-### D: raw retries versus final cells
+- **Observed:** the first `--run` stopped before any API call with `csv product.csv, customers.csv, orders.csv -> fingerprint differs from manifest.json; get the kit again`. The working-copy CSV files were larger than in the kit (`customers.csv` 2219 bytes vs 2159, `orders.csv` 14352 vs 13954, `product.csv` 58 vs 52); `boutique.sqlite` was unchanged (53248 bytes).
+- **Cause:** after `git checkout anto` and `git merge origin/main`, Git for Windows (`core.autocrlf`) rewrote the text files with CRLF line endings; each size difference equals the file's number of lines.
+- **Fix:** restored the kit's original `data/*.csv`, `data/manifest.json` and `schema.sql`, and added `.gitattributes` (`data/** -text`, `*.sqlite binary`, `schema.sql -text`). The second run passed the local checks.
+- **Impact:** no API call consumed. The prompt is unaffected (the skeleton reads `schema.sql` in text mode, so line endings are normalised before hashing).
 
-D recorded six 429 responses across C16–C20 and five retries. The final comparison still contains 20 cells, with C18 `not_executed`. Provisional accounting is **20 final cells and 25 raw attempts**. Verify this against the raw trace because one reported 429 may be a first attempt or retry, and the distinction matters.
+Incidents D2 and E1 have the same cause; C met it too when cloning (fixed locally with `git config core.autocrlf false`). The `.gitattributes` added by E prevents it for everyone from now on.
 
-A fallback was requested for C18. No evidence supplied here shows that fallback was used.
 
-### Access check
-
-- Run-notes table: 1 access check.
-- Earlier narrative: initial network check counted 3 Groq + 2 OpenRouter calls.
-
-These are inconsistent. Verify against the saved `check_access.py` output and keep access-check calls separate from model-cell calls.
-
-### Allowances
-
-- C: 50/50 before; 30/50 after.
-- D: allowance fields missing.
-- E: 50/day, 0 before; 30/50 after.
-- A: 28 remaining is a user-entered figure, but it conflicts with a claim of 1000 remaining and 20 calls; **unverified**.
-- B: unknown.
-
-## 5. Incidents: observations and hypotheses
-
-| Batch | Observed | Hypothesis / pending check |
-|---|---|---|
-| A | 20 final cells, all correct; notes conflict on 22 versus 20. | 22 may count invocations/attempts rather than unique API cells; verify logs. |
-| C | 8 incorrect and 1 `sql_invalid`. | Cell-specific cause is not supplied; inspect SQL/error and comparison rows. |
-| D | Six 429s across C16–C20, five retries; C18 ended `not_executed`. | Rate limiting is consistent with 429; do not claim a fallback ran without a trace. |
-| E | Initial fingerprint/integrity preflight failed with 0 API calls; rerun produced 20 HTTP-200 results. | Local preflight failure, not API access failure. |
-
-No SQL text or error details for C, D, or E were supplied here. Do not fabricate them. Use the comparison files and raw traces for any wrong-answer example.
-
-## 6. Pending cross-checks and deliverables
-
-- [ ] B final rows, traces, and allowance/access notes.
-- [ ] C/D/E literal commands and exact timestamps.
-- [ ] D raw attempt ledger for C16–C20 and C18 fallback status.
-- [ ] Access-check output and counter reconciliation.
-- [ ] A allowance reconciliation.
-- [ ] `model-question-comparison-en.csv` cell-level check.
-- [ ] Merged `traces-td1.csv`, retaining all attempts.
-- [ ] `five-model-summary-en.csv` with portfolio-backed sources/dates and limits.
-- [ ] Models × questions pivot.
-- [ ] Division of work and member contributions.
-- [ ] Repository links, merged artifacts, and report cross-references.
-
-## 7. Reference filenames
-
-Textual references to retain/update as artifacts are recovered:
-
-- `traces-A.csv`
-- `traces-td1.csv`
-- `model-question-comparison-en.csv`
-- `five-model-summary-en.csv`
-- `portefeuille-modeles-2026-09-28.csv`
-- `enonce-td1-en.md`
-- saved access-check output
-- run log / state files for A–E
