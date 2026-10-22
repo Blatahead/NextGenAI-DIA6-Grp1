@@ -1,6 +1,6 @@
 # TD1 report — Comparing models on the same questions
 
-**TD group:** DIA6 · **Sub-group:** 1 · **Session:** 21 October 2026 · **Course pack:** 2026-10-18-students-1 (model selection of 14 October 2026)
+**Session:** 21 October 2026 · **Course pack:** 2026-10-18-students-1 (model selection of 14 October 2026)
 
 Every figure below comes from a file of this repository: `reference-td1.csv`, the raw traces in `traces/` and `state/`, `model-question-comparison-en.csv`, `five-model-summary-en.csv` and `notes/run-notes-td1.md`. Items that no file records are marked _to fill_.
 
@@ -34,7 +34,7 @@ Every figure below comes from a file of this repository: `reference-td1.csv`, th
 - All rows have nature `real`; no replayed or simulated row exists in this batch.
 - Runs took place on 21 October between 14:46 and 14:57 (Paris time), one operator at a time; exact commands and times are in `notes/run-notes-td1.md`.
 - The same prompt (`prompts-en.md`, unchanged skeleton prompt) was sent to every model: each question has a single `prompt_sha256` across the five traces.
-- Raw files: `traces/traces-A.csv` … `traces/traces-E.csv` and `state/state-A.jsonl` … `state/state-E.jsonl`, all attempts kept.
+- Raw files: `traces-td1.csv` and `traces-td1.jsonl` (all 107 attempts merged), built from the source files `traces/traces-A.csv` … `traces/traces-E.csv` and `state/state-A.jsonl` … `state/state-E.jsonl`, kept unchanged.
 
 ## 4. Results
 
@@ -136,17 +136,17 @@ _To fill (group): declared use of AI coding assistance, with a link to `prompts-
 
 ## 11. Next steps
 
-1. Create `traces-td1.csv` and `traces-td1.jsonl` at the repository root: all 107 attempts under one header, source files in `traces/` and `state/` kept unchanged.
-2. Choose the source of index and prices and harmonise `five-model-summary-en.csv`; complete the Dots row.
-3. Fill the reference work split, contributions and AI-assistance sections.
-4. TD 2: complete `vote_k_sur_n`, test it on these traces (no new network batch required) and analyse the C10 wrong agreement.
+1. Choose the source of index and prices and harmonise `five-model-summary-en.csv`; complete the Dots row.
+2. Fill the reference work split, contributions and AI-assistance sections.
+3. TD 2: complete `vote_k_sur_n`, test it on these traces (no new network batch required) and analyse the C10 wrong agreement.
 
 ## 12. Evidence
 
 | File | Content |
 |---|---|
 | `reference-td1.csv` | 20 reference queries and values |
-| `traces/traces-{A..E}.csv`, `state/state-{A..E}.jsonl` | 107 raw attempts, all measurements kept |
+| `traces-td1.csv`, `traces-td1.jsonl` | All 107 attempts of the five batches merged (one CSV header; one JSON line per attempt), rows copied unchanged from the source files; `python skeleton-multi-llm-en.py --rates` reads `traces-td1.jsonl` by default |
+| `traces/traces-{A..E}.csv`, `state/state-{A..E}.jsonl` | Source files per operator, kept unchanged |
 | `model-question-comparison-en.csv` | 100 final rows with status, value, reference, explanation, trace file and `cell_id` |
 | `five-model-summary-en.csv` | One row per model: index, prices, access, family results |
 | `notes/run-notes-td1.md` | Allocation, commands, counters, incidents |

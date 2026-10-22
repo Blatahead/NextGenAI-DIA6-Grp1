@@ -4,6 +4,8 @@ ESILV, *Next Generation AI / Trustworthy Generative AI* (Topic 1, D. Parisot). S
 
 ## Sub-group
 
+**DIA class:** DIA6 · **Sub-group:** DIA6-G1
+
 | Member | Git branch | TD 1 role |
 |---|---|---|
 | Antonin _(full name)_ | `anto` | _to fill_ |
