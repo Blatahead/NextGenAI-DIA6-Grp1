@@ -2,7 +2,9 @@
 
 Allocation, quota counters and commands actually run. Counted separately: initial calls (base batch), access checks, retries. A new key adds no capacity.
 
-Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc` column of each trace when available; counts come from the raw traces (`traces-X.csv`). A value that no trace or console records is marked _to fill (name)_ and is not guessed.
+Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc` column of each trace when available; counts come from the raw traces (`traces/traces-X.csv`). A value that no trace or console records is marked _to fill (name)_ and is not guessed.
+
+File layout: after the batch (21 Oct), the raw files were moved without any change of content: `traces-X.csv` → `traces/traces-X.csv`, `state-X.jsonl` → `state/state-X.jsonl`. The commands below are shown exactly as they were run, with the former paths. To resume or read an operator's batch now, pass the new paths, e.g. `--state state/state-C.jsonl --out traces/traces-C.csv`.
 
 ## Allocation and allowance (filled at 14:00–14:15)
 
@@ -48,23 +50,23 @@ _HTTP status, `Retry-After`, timeouts, reallocations, fallback data used (label:
 
 ### A — no incident
 
-20 attempts, all HTTP 200, no 429, no timeout, no retry; 20/20 correct. Traces: `state-A.jsonl`, `traces-A.csv` (nature `real`).
+20 attempts, all HTTP 200, no 429, no timeout, no retry; 20/20 correct. Traces: `state/state-A.jsonl`, `traces/traces-A.csv` (nature `real`).
 
 ### B1 — HTTP 429 on tokens per minute (operator B, 14:50–14:51)
 
 - **Observed:** first attempt of C19 (12:50:49 UTC) and C20 (12:50:56 UTC) refused with HTTP 429 "Rate limit reached for model `openai/gpt-oss-20b` ... on tokens per minute (TPM): Limit 8000" (used 6807 + requested 1344 for C19, used 6975 + requested 1052 for C20).
 - **Retry:** one retry each, a few seconds later, HTTP 200; final verdict correct for both. `Retry-After` is not stored in the trace.
-- **Impact:** 2 retries out of the 5-call margin; no cell lost. Nature: real. Traces: `state-B.jsonl`, `traces-B.csv`.
+- **Impact:** 2 retries out of the 5-call margin; no cell lost. Nature: real. Traces: `state/state-B.jsonl`, `traces/traces-B.csv`.
 
 ### C — no access incident
 
-20 attempts, all HTTP 200, no 429, no timeout, no retry. One answer was invalid SQL (C02, `syntax_error near "AS"`): a model error, not an access error. In the console the C14 verdict line was not printed, but `traces-C.csv` contains it (correct, 0 = 0). Traces: `state-C.jsonl`, `traces-C.csv` (nature `real`, one prompt fingerprint per question).
+20 attempts, all HTTP 200, no 429, no timeout, no retry. One answer was invalid SQL (C02, `syntax_error near "AS"`): a model error, not an access error. In the console the C14 verdict line was not printed, but `traces/traces-C.csv` contains it (correct, 0 = 0). Traces: `state/state-C.jsonl`, `traces/traces-C.csv` (nature `real`, one prompt fingerprint per question).
 
 ### D1 — HTTP 429 on output tokens per minute (operator D, 14:48–14:49)
 
 - **Observed:** HTTP 429 "Rate limit reached ... on output tokens per minute (OTPM): Limit 1000" on C16, C17, C18 (twice), C19 and C20: 6 responses. The first came 53 s after the first call. `Retry-After` is not stored in the trace.
 - **Retry:** the retry worked for C16, C17, C19 and C20 and failed for C18, which stays `not_executed` (maximum of two attempts per cell reached). C19 then returned `sql_rejected` (`not_select`): a model answer, not an access error.
-- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: `notes/model-D-qwen-report.md`, `notes/comparison-rows-D.csv`.
+- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: `notes/model-D-qwen-report.md`, D rows of `model-question-comparison-en.csv`.
 
 ### D2 — Data fingerprints changed by Git line endings (operator D, before the run)
 
