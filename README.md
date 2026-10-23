@@ -9,7 +9,7 @@ ESILV, *Next Generation AI / Trustworthy Generative AI* (Topic 1, D. Parisot). S
 | Member | Git branch | TD 1 role |
 |---|---|---|
 | Antonin _(full name)_ | `anto` | Operator E (Dots, OpenRouter account 2); shared repository; checked references C11–C20 |
-| Bart _(full name)_ | `bart` | Operator D with Emma (Qwen, Groq); wrote references C16–C20 |
+| Bart _Barthélemi STOLTZ_ | `bart` | Operator D with Emma (Qwen, Groq); wrote references C16–C20 |
 | Benjamin _(full name)_ | `ben` | Operator C (North Mini Code, OpenRouter account 1); checked references C01–C10; merged the common files |
 | Emma _(full name)_ | `emma` | Operator D with Bart (Qwen, Groq); wrote references C11–C15 |
 | Jean-Walter _(full name)_ | `jw` | Operator B (GPT-OSS 20B, Groq); wrote references C06–C10 |
