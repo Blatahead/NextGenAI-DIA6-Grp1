@@ -8,12 +8,12 @@ ESILV, *Next Generation AI / Trustworthy Generative AI* (Topic 1, D. Parisot). S
 
 | Member | Git branch | TD 1 role |
 |---|---|---|
-| Antonin _(full name)_ | `anto` | Operator E (Dots, OpenRouter account 2); shared repository; checked references C11–C20 |
+| Antonin BIRON | `anto` | Operator E (Dots, OpenRouter account 2); shared repository; checked references C11–C20 |
 | Barthélemi STOLTZ | `bart` | Operator D with Emma (Qwen, Groq); wrote references C16–C20 |
 | Benjamin ZILBER | `ben` | Operator C (North Mini Code, OpenRouter account 1); checked references C01–C10; merged the common files |
-| Emma _(full name)_ | `emma` | Operator D with Bart (Qwen, Groq); wrote references C11–C15 |
-| Jean-Walter _(full name)_ | `jw` | Operator B (GPT-OSS 20B, Groq); wrote references C06–C10 |
-| Noé _(full name)_ | `noe` | Operator A (GPT-OSS 120B, Groq); wrote references C01–C05 |
+| Emma GOLIARD | `emma` | Operator D with Bart (Qwen, Groq); wrote references C11–C15 |
+| Jean-Walter GERARD | `jw` | Operator B (GPT-OSS 20B, Groq); wrote references C06–C10 |
+| Noé PAYAN | `noe` | Operator A (GPT-OSS 120B, Groq); wrote references C01–C05 |
 
 TD 1 roles: A, B, C and E each ran one model (20 cells); Emma and Bart ran D together; C and E used two different OpenRouter accounts. Four members wrote the 20 reference queries and two members checked them (`written_by` / `checked_by` in `reference-td1.csv`). Details: `reports/td1.md`, section 9. Roles rotate in TD 2 and TD 3.
 
