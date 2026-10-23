@@ -141,7 +141,7 @@ Proposed division of work, to be confirmed by each member:
 | Antonin | E (Dots, OpenRouter account 2) | Created the shared repository (kit layout, README, templates, `prompts-en.md`, run-notes and report templates); batch E and its failure causes; line-ending fix (`.gitattributes`, incident E1); OpenRouter activity evidence; checked references C11–C20 | `README.md`, `prompts-en.md`, `.gitattributes`, `traces/traces-E.csv`, `notes/openrouter-activity-E-2026-10-21.csv` |
 | Noé | A (gpt-oss-120b, Groq) | Batch A; wrote references C01–C05; A rows of the comparison and the five-model summary | `traces/traces-A.csv`, `reference-td1.csv` |
 | Jean-Walter | B (gpt-oss-20b, Groq) | Batch B and its failure causes; wrote references C06–C10; generated and committed `reference-td1.csv`; first index and price research for the five-model summary | `traces/traces-B.csv`, `reference-td1.csv`, `remplir_csv.py`, `five-model-summary-en.csv` |
-| Emma | D (qwen3.8-27b, Groq, with Bart) | Batch D; wrote references C11–C15; D failure causes and incidents D1/D2 | `traces/traces-D.csv`, `notes/model-D-qwen-report.md` |
+| Emma | D (qwen3.8-27b, Groq, with Bart) | Batch D; wrote references C11–C15; D failure causes and incidents D1/D2 | `traces/traces-D.csv`, D rows of `model-question-comparison-en.csv` |
 | Bart | D (with Emma) | Batch D; wrote references C16–C20; D row of the five-model summary | `traces/traces-D.csv`, `reference-td1.csv` |
 | Benjamin | C (north-mini-code, OpenRouter account 1) | Batch C and its failure causes; checked references C01–C10 and re-checked all 20; merged the common files (100-row comparison, five-model summary, `traces-td1.*`); harmonised the run notes; `traces/` and `state/` layout; this report | `traces/traces-C.csv`, `model-question-comparison-en.csv`, `five-model-summary-en.csv`, `traces-td1.csv`, `notes/run-notes-td1.md`, `reports/td1.md` |
 
@@ -165,5 +165,5 @@ _To fill (group): declared use of AI coding assistance, with a link to `prompts-
 | `model-question-comparison-en.csv` | 100 final rows with status, value, reference, explanation, trace file and `cell_id` |
 | `five-model-summary-en.csv` | One row per model: index, prices, access, family results |
 | `notes/run-notes-td1.md` | Allocation, commands, counters, incidents |
-| `notes/model-D-qwen-report.md`, `notes/openrouter-activity-E-2026-10-21.csv` | Operator notes and evidence for D and E |
+| `notes/openrouter-activity-E-2026-10-21.csv` | OpenRouter activity export of operator E: allowance evidence (20 requests on 21 Oct, $0) |
 | `prompts-en.md` | Experiment prompt as used, AI-assistance log |
