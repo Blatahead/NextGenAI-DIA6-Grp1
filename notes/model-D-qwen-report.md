@@ -1,6 +1,6 @@
 # Operator D: `groq:qwen/qwen3.8-27b` (TD 1, 21 October 2026)
 
-Material written for operator D, to paste into the shared files. It is kept in its own file so that six people editing `reports/td1.md` and the CSVs on different branches do not create merge conflicts. Source of every figure: `traces-D.csv` and `state-D.jsonl` (nature `real`, run on 2026-10-21 at 12:47:14 to 12:49:00 UTC, i.e. 14:47 to 14:49 Paris time).
+Material written for operator D, to paste into the shared files. It is kept in its own file so that six people editing `reports/td1.md` and the CSVs on different branches do not create merge conflicts. Source of every figure: `traces/traces-D.csv` and `state/state-D.jsonl` (nature `real`, run on 2026-10-21 at 12:47:14 to 12:49:00 UTC, i.e. 14:47 to 14:49 Paris time).
 
 Items marked **TO FILL** need information only the operator has.
 
@@ -12,11 +12,11 @@ Items marked **TO FILL** need information only the operator has.
 
 - 20 cells for `groq:qwen/qwen3.8-27b` (C01 to C20), one operator, Groq Free plan, command in section B.
 - Result of the 20 cells: **13 correct, 5 incorrect, 1 `sql_rejected`, 1 `not_executed`**. 25 HTTP attempts in total (20 first attempts, 5 retries).
-- Final result per cell: `notes/comparison-rows-D.csv` (20 rows, to be merged into `model-question-comparison-en.csv`).
+- Final result per cell: `model-question-comparison-en.csv`, the 20 rows with `model_id` = `groq:qwen/qwen3.8-27b` (merged there from the former `notes/comparison-rows-D.csv`).
 
 ### 2. What worked
 
-- 13/20 cells correct against our reference: C01 to C08, C11, C12, C13, C14, C20 (`cell_id` = `groq:qwen/qwen3.8-27b:Cxx` in `traces-D.csv`).
+- 13/20 cells correct against our reference: C01 to C08, C11, C12, C13, C14, C20 (`cell_id` = `groq:qwen/qwen3.8-27b:Cxx` in `traces/traces-D.csv`).
 - All six plain period questions (C01, C04, C05, C06, C07, C20) and all four product-list questions (C03, C12, C13, C14) were correct, including the edge cases (empty periods C06 and C14 returned 0; one-day periods C05 and C07).
 - Age on the reference date was correct in 3 of 4 cases (C02, C08, C11).
 - For answered calls, latency was about 0.3 to 0.8 s (column `latency_ms`).
@@ -50,8 +50,8 @@ Items marked **TO FILL** need information only the operator has.
 
 | Member | Work | Files | Checked by |
 |---|---|---|---|
-| **TO FILL** | Ran operator D batch (Qwen, 20 cells) | `state-D.jsonl`, `traces-D.csv` | **TO FILL** |
-| **TO FILL** | Read the traces, wrote causes | `notes/comparison-rows-D.csv`, this file | **TO FILL** |
+| **TO FILL** | Ran operator D batch (Qwen, 20 cells) | `state/state-D.jsonl`, `traces/traces-D.csv` | **TO FILL** |
+| **TO FILL** | Read the traces, wrote causes | D rows of `model-question-comparison-en.csv`, this file | **TO FILL** |
 
 ### 6. Next steps and help needed (model D)
 
@@ -85,7 +85,7 @@ HTTP 429 (output tokens per minute limit 1000 on `qwen/qwen3.8-27b`) on C16, C17
 
 ## C. For `five-model-summary-en.csv` (row for `qwen/qwen3.8-27b`)
 
-Read the figures below as the content of each column; the CSV line itself is in `notes/five-model-summary-D-row.csv`.
+Read the figures below as the content of each column; the CSV line itself is the `qwen/qwen3.8-27b` row of `five-model-summary-en.csv`.
 
 | Column | Value |
 |---|---|
@@ -99,5 +99,5 @@ Read the figures below as the content of each column; the CSV line itself is in 
 | age_results | reference date: 3/4 correct (C02, C08, C11 ok, C09 wrong); order time: 0/1 (C10 wrong) |
 | product_results | 4/4 correct (C03, C12, C13, C14) |
 | combined_results | 0/3 evaluated correct (C15, C16, C17 wrong); C18 not executed (HTTP 429 twice); C19 sql_rejected. Combined questions overlap with the period, age and product families |
-| trace_files | `traces-D.csv`, `state-D.jsonl` |
+| trace_files | `traces/traces-D.csv`, `state/state-D.jsonl` |
 | limits | 20 questions only; Groq OTPM limit of 1000 caused 6 x HTTP 429; one run, no repetition; C18 unexecuted |

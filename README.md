@@ -4,6 +4,8 @@ ESILV, *Next Generation AI / Trustworthy Generative AI* (Topic 1, D. Parisot). S
 
 ## Sub-group
 
+**DIA class:** DIA6 · **Sub-group:** DIA6-G1
+
 | Member | Git branch | TD 1 role |
 |---|---|---|
 | Antonin _(full name)_ | `anto` | _to fill_ |
@@ -53,7 +55,8 @@ python3 verify-data.py                 # last object: "ok": true
 python3 check_access.py --no-network   # local checks only, no quota used
 
 # keys in environment variables, then (one operator at a time):
-python3 skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C02 --state state-A.jsonl --out traces-A.csv
+python3 skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C02 --state state/state-A.jsonl --out traces/traces-A.csv
+python3 skeleton-multi-llm-en.py --rates --state state/state-A.jsonl          # rates of one operator
 python3 skeleton-multi-llm-en.py --rates --state traces-td1.jsonl
 
 # offline
