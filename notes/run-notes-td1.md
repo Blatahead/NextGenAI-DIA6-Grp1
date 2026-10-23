@@ -66,7 +66,7 @@ _HTTP status, `Retry-After`, timeouts, reallocations, fallback data used (label:
 
 - **Observed:** HTTP 429 "Rate limit reached ... on output tokens per minute (OTPM): Limit 1000" on C16, C17, C18 (twice), C19 and C20: 6 responses. The first came 53 s after the first call. `Retry-After` is not stored in the trace.
 - **Retry:** the retry worked for C16, C17, C19 and C20 and failed for C18, which stays `not_executed` (maximum of two attempts per cell reached). C19 then returned `sql_rejected` (`not_select`): a model answer, not an access error.
-- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: `notes/model-D-qwen-report.md`, D rows of `model-question-comparison-en.csv`.
+- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: D rows of `model-question-comparison-en.csv`.
 
 ### D2 — Data fingerprints changed by Git line endings (operator D, before the run)
 
