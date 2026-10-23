@@ -17,8 +17,16 @@ Every figure below comes from a file of this repository: `reference-td1.csv`, th
 - `reference-td1.csv`: C01 to C20, one SQLite `SELECT` returning one column `revenue_cents` and its integer value.
 - All 20 values equal the instructor's answer key ([TD 1 reference values](https://storage.googleapis.com/docs.g.quanticfactory.io/ESILV/next-generation-ai/latest/students/reference-values-td1-en.html), published 21 Oct 2026).
 - Conventions applied: period closed on the left, open on the right (`date >= start AND date < end`); completed age computed from year, month and day on the reference date (or on the order date for "at the time of the order"); revenue = `SUM(quantity_product * price)` in cents excluding VAT; `COALESCE(..., 0)` when nothing matches.
-- Work split: four members wrote the queries and two members checked them. The 20 values were committed by Jean-Walter (with `remplir_csv.py`). An independent check by Benjamin re-executed the 20 queries on the read-only base and recomputed each value in Python from the three CSV files, without SQL: 20/20 identical.
-- _To fill (group): which member wrote and which member checked each question._
+- Work split (columns `written_by` and `checked_by` of `reference-td1.csv`):
+
+  | Questions | Written by | Checked by |
+  |---|---|---|
+  | C01–C05 | Noé | Benjamin |
+  | C06–C10 | Jean-Walter | Benjamin |
+  | C11–C15 | Emma | Antonin |
+  | C16–C20 | Bart | Antonin |
+
+- The 20 queries and values were committed by Jean-Walter (with `remplir_csv.py`). In addition, Benjamin re-executed all 20 queries on the read-only base and recomputed each value in Python from the three CSV files, without SQL: 20/20 identical.
 
 ## 3. Model runs (step 2)
 
@@ -111,7 +119,7 @@ No `Retry-After` value is stored in the traces. Details and timestamps: `notes/r
 `five-model-summary-en.csv` has one row per model: public index, paid route of the same model and prices with source and date, access used, results by family (period, age, product, combined, with the overlap view) and trace files.
 
 - OpenRouter models C and E: no paid route of the exact same model is documented (free route only), so prices are N/A with the reason.
-- **Open point:** for A, B and D the index and prices currently come from Artificial Analysis and the Groq documentation (21 Oct), whereas the operators' notes used the course portfolio of 28 Sept (e.g. A index 11.6 vs 12; D: no paid route in the portfolio vs Groq on-demand 0.80/4.00 USD per M tokens). The group must choose one source and apply it to all five rows.
+- Source rule, applied to all rows: **public index from the course portfolio** (`portefeuille-modeles-2026-09-28.csv`, one scale and one date for every model: A 11.6, B 9, D 33.7; C and E are absent, so N/A). **Prices from the portfolio when it lists a paid route of the same model** (A: OpenRouter, 0.15 / 0.60 USD per M tokens); otherwise from the provider's documentation, with source and date (B and D: Groq on-demand, read 21 Oct: 0.075 / 0.30 and 0.80 / 4.00).
 - _To fill (E): `access_used` and `limits` of the Dots row._
 
 These results support a routing hypothesis for this batch only (period and product-list questions were solved by all five models; age questions separate them), not a general ranking.
@@ -126,9 +134,16 @@ These results support a routing hypothesis for this batch only (period and produ
 
 ## 9. Contributions
 
-_To fill (group): division of work agreed by the sub-group._
+Proposed division of work, to be confirmed by each member:
 
-Batch operators (from the run notes): A Noé, B Jean-Walter, C Benjamin, D Emma and Bart, E Antonin.
+| Member | Operator | Work | Main files |
+|---|---|---|---|
+| Antonin | E (Dots, OpenRouter account 2) | Created the shared repository (kit layout, README, templates, `prompts-en.md`, run-notes and report templates); batch E and its failure causes; line-ending fix (`.gitattributes`, incident E1); OpenRouter activity evidence; checked references C11–C20 | `README.md`, `prompts-en.md`, `.gitattributes`, `traces/traces-E.csv`, `notes/openrouter-activity-E-2026-10-21.csv` |
+| Noé | A (gpt-oss-120b, Groq) | Batch A; wrote references C01–C05; A rows of the comparison and the five-model summary | `traces/traces-A.csv`, `reference-td1.csv` |
+| Jean-Walter | B (gpt-oss-20b, Groq) | Batch B and its failure causes; wrote references C06–C10; generated and committed `reference-td1.csv`; first index and price research for the five-model summary | `traces/traces-B.csv`, `reference-td1.csv`, `remplir_csv.py`, `five-model-summary-en.csv` |
+| Emma | D (qwen3.8-27b, Groq, with Bart) | Batch D; wrote references C11–C15; D failure causes and incidents D1/D2 | `traces/traces-D.csv`, `notes/model-D-qwen-report.md` |
+| Bart | D (with Emma) | Batch D; wrote references C16–C20; D row of the five-model summary | `traces/traces-D.csv`, `reference-td1.csv` |
+| Benjamin | C (north-mini-code, OpenRouter account 1) | Batch C and its failure causes; checked references C01–C10 and re-checked all 20; merged the common files (100-row comparison, five-model summary, `traces-td1.*`); harmonised the run notes; `traces/` and `state/` layout; this report | `traces/traces-C.csv`, `model-question-comparison-en.csv`, `five-model-summary-en.csv`, `traces-td1.csv`, `notes/run-notes-td1.md`, `reports/td1.md` |
 
 ## 10. AI assistance
 
@@ -136,8 +151,8 @@ _To fill (group): declared use of AI coding assistance, with a link to `prompts-
 
 ## 11. Next steps
 
-1. Choose the source of index and prices and harmonise `five-model-summary-en.csv`; complete the Dots row.
-2. Fill the reference work split, contributions and AI-assistance sections.
+1. Complete the Dots row of `five-model-summary-en.csv` (`access_used`, `limits`).
+2. Confirm the contributions and fill the AI-assistance section and log.
 3. TD 2: complete `vote_k_sur_n`, test it on these traces (no new network batch required) and analyse the C10 wrong agreement.
 
 ## 12. Evidence
