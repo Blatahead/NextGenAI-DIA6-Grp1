@@ -120,7 +120,6 @@ No `Retry-After` value is stored in the traces. Details and timestamps: `notes/r
 
 - OpenRouter models C and E: no paid route of the exact same model is documented (free route only), so prices are N/A with the reason.
 - Source rule, applied to all rows: **public index from the course portfolio** (`portefeuille-modeles-2026-09-28.csv`, one scale and one date for every model: A 11.6, B 9, D 33.7; C and E are absent, so N/A). **Prices from the portfolio when it lists a paid route of the same model** (A: OpenRouter, 0.15 / 0.60 USD per M tokens); otherwise from the provider's documentation, with source and date (B and D: Groq on-demand, read 21 Oct: 0.075 / 0.30 and 0.80 / 4.00).
-- _To fill (E): `access_used` and `limits` of the Dots row._
 
 These results support a routing hypothesis for this batch only (period and product-list questions were solved by all five models; age questions separate them), not a general ranking.
 
@@ -128,13 +127,16 @@ These results support a routing hypothesis for this batch only (period and produ
 
 - One sample per model and question (temperature 0): no variability measured, no general error rate.
 - C18 of D has no result (access failure): D has 19 evaluated cells, and its combined family 4 evaluated questions out of 5.
-- Allowances: C and E recorded their OpenRouter free-model counters before and after the batch (50/50 → 30/50). For A and B the run notes give "fresh key created 21 Oct" and "25 total API calls recorded", which are not remaining-allowance readings (Groq limits apply to the organisation, not the key); D's allowance is not recorded. _To clarify (A, B, D)._
-- `check_access` network runs recorded in the run notes: C on 16 Oct, D and E on 20 Oct, A and B on 21 Oct (preparation deadline: 18 Oct). _To clarify (group)._
+- Allowances, as recorded in the run notes:
+  - C and E: OpenRouter free-model counters read before and after the batch (50/50 → 30/50).
+  - D: not read before the run; Groq console limit 80K tokens per 24 h, 14.5K used after the batch (equal to the 14,514 tokens of `traces/traces-D.csv`), so about 65.5K left.
+  - A and B: the Groq limit (200K tokens per day) before the run and "25 total API calls recorded on 21 Oct" after; the remaining allowance itself was not read. Groq limits apply to the organisation, not to the key.
+- `check_access` network runs, as recorded in the run notes: C on 16 Oct, D and E on 20 Oct, A and B on 21 Oct before their batches (preparation deadline: 18 Oct).
 - `cost_native`: 0 for every OpenRouter attempt (C, E: free routes, cost reported by the provider) and empty for every Groq attempt (A, B, D: no cost returned). An empty value is a missing measurement, not a zero cost.
 
 ## 9. Contributions
 
-Proposed division of work, to be confirmed by each member:
+Division of work, confirmed by each member:
 
 | Member | Operator | Work | Main files |
 |---|---|---|---|
@@ -147,13 +149,22 @@ Proposed division of work, to be confirmed by each member:
 
 ## 10. AI assistance
 
-_To fill (group): declared use of AI coding assistance, with a link to `prompts-en.md`._
+Every member used an AI assistant. Each prompt is logged in [`prompts-en.md`](../prompts-en.md) (section 3) with what was kept and how it was checked.
+
+| Member | Tool | Entries | Main uses |
+|---|---|---:|---|
+| Antonin | Claude | 9 | Repository layout; diagnosis of the CRLF incident (E1); operator E run notes; `build_comparison.py` (since removed); causes of the E failures; Dots row |
+| Benjamin | Claude Code | 7 | Environment set-up; explanation of TD 1; clone of the shared repository and CRLF fix; check of the references and batch C commands; merge of the common CSVs; `traces/` / `state/` layout and merged traces |
+| Bart, with Emma (same computer) | Claude Code | 5 | Kit organisation; Git help; diagnosis of the CRLF incident (D2); reading of the D traces and causes; Groq quota reading |
+| Jean-Walter | Gemini, Claude | 3 | Restoring the original `data/` files; CSV of the final attempts; diagnosis of the B age failures |
+| Noé | Gemini | 3 | Clarification of the instructions (allowance, traces, batch command); reading of the terminal output; Git status before pushing |
+
+No reference amount comes from a model: the 20 references are SQL results on the database, checked independently (section 2).
 
 ## 11. Next steps
 
-1. Complete the Dots row of `five-model-summary-en.csv` (`access_used`, `limits`).
-2. Confirm the contributions and fill the AI-assistance section and log.
-3. TD 2: complete `vote_k_sur_n`, test it on these traces (no new network batch required) and analyse the C10 wrong agreement.
+1. TD 2 (18 Nov): complete `vote_k_sur_n`, test it on these traces (no new network batch required) and analyse the C10 wrong agreement.
+2. TD 2: write the routing rule with `templates/routing-rule-en.md` and run it on the seven scenarios of `atelier-routage.py`.
 
 ## 12. Evidence
 
