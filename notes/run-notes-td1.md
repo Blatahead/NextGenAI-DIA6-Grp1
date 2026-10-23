@@ -13,7 +13,7 @@ File layout: after the batch (21 Oct), the raw files were moved without any chan
 | A | Noé | `groq:openai/gpt-oss-120b` | Groq | 200k tokens per day |1 run on 21 Oct (3 Groq+2OR) | 20 | 5 |
 | B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | 200k tokens per day | 1 run (3 Groq + 2 OR) on 21 Oct | 20 | 5 |
 | C | Benjamin | `openrouter:cohere/north-mini-code:free` | OpenRouter (account 1) | 50/50 free-model requests for 21 Oct (`/api/v1/key`, 14:45, free tier, $0 spent) | 1 run on 16 Oct (3 Groq + 2 OR), none on 21 Oct | 20 | 5 |
-| D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | _to fill (Emma, Bart): value read in the Groq console_ | 1 run on 20 Oct (3 Groq) | 20 | 5 |
+| D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | Not recorded before the run. Groq console limit: 80K tokens per 24 h; the 14.5K used shown afterwards equals this run's tokens (14,514 in `traces/traces-D.csv`), so about 80K were available | 1 run on 20 Oct, 5/5 OK (3 Groq calls on this account + 2 OpenRouter) | 20 | 5 |
 | E | Antonin | `openrouter:dots-studio/dots-3-note-preview:free` | OpenRouter (account 2, ≠ C) | 50/50 free-model requests for 21 Oct (OpenRouter Activity, limit 50/day without purchased credits) | 1 run on 20 Oct (3 Groq + 2 OR); an earlier run that day stopped before any call (missing keys) | 20 | 5 |
 
 ## Commands run
@@ -36,7 +36,7 @@ File layout: after the batch (21 Oct), the raw files were moved without any chan
 | A | 20 | 0 |1 run (3 Groq + 2 OR) on 21 Oct | Free Tier Active, 25 total API calls recorded on 21 Oct | none |
 | B | 20 | 2 (C19, C20) | 1 run (3 Groq + 2 OR) on 21 Oct | Free Tier Active, 25 total API calls recorded on 21 Oct | none |
 | C | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent | none |
-| D | 20 | 5 (C16, C17, C18, C19, C20) | 1 run on 20 Oct (3 Groq) | _to fill (Emma, Bart): value read in the Groq console_ | C18 `not_executed` (HTTP 429 twice): instructor fallback requested, not used so far |
+| D | 20 | 5 (C16, C17, C18, C19, C20) | 1 run on 20 Oct, 5/5 OK (3 Groq + 2 OR) | About 65.5K of 80K tokens per 24 h left (Groq console, read after the batch: 14.5K used) | C18 `not_executed` (HTTP 429 twice): instructor fallback requested, not used so far |
 | E | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent (resets at 00:00 UTC; evidence `notes/openrouter-activity-E-2026-10-21.csv`) | none |
 | **Total** | **100** | **7** | counted per operator above | | **1 cell (D, C18)** |
 
@@ -66,7 +66,7 @@ _HTTP status, `Retry-After`, timeouts, reallocations, fallback data used (label:
 
 - **Observed:** HTTP 429 "Rate limit reached ... on output tokens per minute (OTPM): Limit 1000" on C16, C17, C18 (twice), C19 and C20: 6 responses. The first came 53 s after the first call. `Retry-After` is not stored in the trace.
 - **Retry:** the retry worked for C16, C17, C19 and C20 and failed for C18, which stays `not_executed` (maximum of two attempts per cell reached). C19 then returned `sql_rejected` (`not_select`): a model answer, not an access error.
-- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: `notes/model-D-qwen-report.md`, D rows of `model-question-comparison-en.csv`.
+- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: D rows of `model-question-comparison-en.csv`.
 
 ### D2 — Data fingerprints changed by Git line endings (operator D, before the run)
 
