@@ -10,8 +10,8 @@ File layout: after the batch (21 Oct), the raw files were moved without any chan
 
 | Operator | Member | Model | Account | Remaining allowance before run | `check_access` calls already used | Cells assigned | Margin reserved |
 |---|---|---|---|---|---|---|---|
-| A | Noé | `groq:openai/gpt-oss-120b` | Groq | Fresh Key created 21 Oct (0 calls used) |1 run on 21 Oct (3 Groq+2OR) | 20 | 5 |
-| B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | Fresh Key created 21 Oct (0 calls used) | 1 run (3 Groq + 2 OR) on 21 Oct | 20 | 5 |
+| A | Noé | `groq:openai/gpt-oss-120b` | Groq | 200k tokens per day |1 run on 21 Oct (3 Groq+2OR) | 20 | 5 |
+| B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | 200k tokens per day | 1 run (3 Groq + 2 OR) on 21 Oct | 20 | 5 |
 | C | Benjamin | `openrouter:cohere/north-mini-code:free` | OpenRouter (account 1) | 50/50 free-model requests for 21 Oct (`/api/v1/key`, 14:45, free tier, $0 spent) | 1 run on 16 Oct (3 Groq + 2 OR), none on 21 Oct | 20 | 5 |
 | D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | _to fill (Emma, Bart): value read in the Groq console_ | 1 run on 20 Oct (3 Groq) | 20 | 5 |
 | E | Antonin | `openrouter:dots-studio/dots-3-note-preview:free` | OpenRouter (account 2, ≠ C) | 50/50 free-model requests for 21 Oct (OpenRouter Activity, limit 50/day without purchased credits) | 1 run on 20 Oct (3 Groq + 2 OR); an earlier run that day stopped before any call (missing keys) | 20 | 5 |
