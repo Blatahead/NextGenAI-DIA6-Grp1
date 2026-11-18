@@ -64,6 +64,7 @@ import time
 import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from dataclasses import asdict, dataclass, fields
 from datetime import datetime, timezone
 from pathlib import Path
@@ -624,7 +625,28 @@ class Orchestrateur:
         families, and look in your traces for a case where several models agree
         on a wrong value.
         """
-        raise NotImplementedError("vote_k_sur_n: to implement in TD 2 (see the procedure in the docstring).")
+        n = len(traces_question)
+        if not (n // 2 < k <= n):
+            raise ValueError(f"k must be a strict majority of n: n // 2 < k <= n (n={n}, k={k})")
+
+        seen = set()
+        for proposal in traces_question:
+            member = (proposal.provider, proposal.model_requested)
+            if member in seen:
+                raise ValueError(f"duplicate member {member[0]}:{member[1]}: a duplicate is not a second vote")
+            seen.add(member)
+
+        # Only executed proposals carrying a value vote; 0 cents is a real value.
+        voters = defaultdict(list)
+        for proposal in traces_question:
+            if proposal.verdict == "executed" and proposal.value is not None:
+                voters[proposal.value].append(f"{proposal.provider}:{proposal.model_requested}")
+
+        largest = max((len(models) for models in voters.values()), default=0)
+        for value, models in voters.items():
+            if len(models) >= k:            # k > n/2: at most one value can reach it
+                return {"consensus": True, "value": value, "votes": len(models), "models": models}
+        return {"consensus": False, "value": None, "votes": largest, "models": []}
 
 
 # ==========================================================================
