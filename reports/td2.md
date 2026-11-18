@@ -92,7 +92,181 @@ Values from `traces-td1.csv` (last attempt), reference from `reference-td1.csv`:
 
 ## 2. Step 2 — The wrong consensus (Pair B)
 
-_To fill (Pair B: Jean-Walter, Noé): case identification (models, reference, 2-of-3 and 3-of-5 results — see C10 and C09 in section 1.4–1.5 and `vote-comparison-td2.csv`), faulty SQL clause and its explanation, delta `SELECT` on `data/boutique.sqlite` isolating the rows of the gap, vote counted by hand then checked with `vote_k_sur_n`._
+
+**Evidence:** [`wrong-consensus-td2.py`](../wrong-consensus-td2.py) (offline, read-only on `data/boutique.sqlite`). Its full output is in [`notes/td2-wrong-consensus-run.txt`](../notes/td2-wrong-consensus-run.txt). Every number below comes from that output.
+
+**Nature:** **real batch**. The values are the last attempt of each cell in [`traces-td1.csv`](../traces-td1.csv) (TD 1, 21 Oct 2026, `nature = real`). The model queries were re-executed today on the unchanged database and return the stored values. The synthetic DEMO-VOTE example is kept apart in §2.8 and is not counted with the measurements.
+
+**Vote used:** Pair A's `Orchestrateur.vote_k_sur_n` (section 1). The script also checks every decision against an independent copy of the TD 2 contract; the two agree on all the decisions below. The quorum results match `vote-comparison-td2.csv`.
+
+### 2.1 Shared wrong values in our batch
+
+The 100 cells (20 questions × 5 models) contain four questions where at least two models return the same wrong value:
+
+| Question | Shared wrong value | Models | Reference | Fixed panel 2-of-3 | Five models 3-of-5 |
+|---|---:|---|---:|---|---|
+| **C10** | **119410** | north-mini-code, qwen3.8-27b, dots-3-note | 558980 | **wrong consensus 119410** | **wrong consensus 119410** |
+| C09 | 0 | north-mini-code, qwen3.8-27b | 487980 | **wrong consensus 0** | consensus 487980 (correct) |
+| C11 | 0 | north-mini-code, dots-3-note | 446690 | consensus 446690 (correct) | abstains (2–2–1) |
+| C15 | 0 | north-mini-code, dots-3-note | 168680 | abstains (1–1–1) | abstains (2–2–1) |
+
+Panels: the fixed panel is `atelier-vote.py`'s, n = 3, k = 2 (gpt-oss-120b, north-mini-code, qwen3.8-27b). The 3-of-5 panel uses the five TD 1 models, n = 5, k = 3. The vote decides without the reference; the comparison is made afterwards.
+
+**C10** is the case we analyse. It is the only one where **both quorums return the same wrong value**. It is also the clearest one: three models write three different queries and still return the same value, to the cent.
+
+### 2.2 C10: identification and quorum verdicts
+
+- **Question C10** (family F2b, "age at the time of the order"): *"What is the total revenue excluding VAT, in euro cents, of the orders placed by customers who were exactly 25 years old at the time of the order?"*
+- **Independent reference:** 558980 cents. The query in `reference-td1.csv` was written by Jean-Walter and checked by Benjamin.
+- **Proposals** (last attempt, all HTTP 200, 1 attempt each):
+
+| Model | Provider | In fixed panel | Value | Trace verdict |
+|---|---|:-:|---:|---|
+| openai/gpt-oss-120b | Groq | yes | 558980 | correct |
+| openai/gpt-oss-20b | Groq | no | 558980 | correct |
+| cohere/north-mini-code:free | OpenRouter | yes | **119410** | incorrect |
+| qwen/qwen3.8-27b | Groq | yes | **119410** | incorrect |
+| dots-studio/dots-3-note-preview:free | OpenRouter | no | **119410** | incorrect |
+
+- **Fixed panel 2-of-3:** `{"consensus": true, "value": 119410, "votes": 2, "models": [north-mini-code, qwen3.8-27b]}`. The vote is wrong, and Dots is not needed for it to be wrong.
+- **3-of-5:** `{"consensus": true, "value": 119410, "votes": 3, "models": [north-mini-code, qwen3.8-27b, dots-3-note]}`. Wrong as well. Adding two models makes the wrong majority stronger. The only correct answers come from the two gpt-oss models, which belong to the same family.
+
+### 2.3 Root cause in the SQL
+
+The reference keeps an order when the customer's age in completed years on the order date is 25:
+
+```sql
+-- reference-td1.csv, C10
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN product p ON o.product_id = p.product_id
+WHERE CAST(strftime('%Y.%m%d', o.date) - strftime('%Y.%m%d', c.birth_date) AS INTEGER) = 25;
+```
+
+That age-25 window runs from the 25th birthday (inclusive) to the 26th birthday (exclusive), so it **spans two calendar years**:
+
+- **(a)** year(order) − year(birth) = 25, and the birthday has already passed in that year;
+- **(b)** year(order) − year(birth) = **26**, and the birthday has **not yet** come in that year.
+
+The three agreeing queries keep only part (a). Their full text, as stored in the traces:
+
+```sql
+-- north-mini-code (OpenRouter)
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN product p ON o.product_id = p.product_id
+WHERE CAST(strftime('%Y', o.date) - strftime('%Y', c.birth_date) AS INTEGER) = 25
+  AND CAST(strftime('%m-%d', o.date) >= CAST(strftime('%m-%d', c.birth_date) AS TEXT) AS INTEGER) = 1;
+```
+
+```sql
+-- qwen3.8-27b (Groq)
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN product p ON o.product_id = p.product_id
+WHERE (
+    (strftime('%Y', o.date) - strftime('%Y', c.birth_date)) = 25
+    AND (strftime('%m', o.date) || strftime('%d', o.date)) >= (strftime('%m', c.birth_date) || strftime('%d', c.birth_date))
+)
+OR (
+    (strftime('%Y', o.date) - strftime('%Y', c.birth_date)) = 24
+    AND (strftime('%m', o.date) || strftime('%d', o.date)) < (strftime('%m', c.birth_date) || strftime('%d', c.birth_date))
+);
+```
+
+```sql
+-- dots-3-note (OpenRouter)
+SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN product p ON o.product_id = p.product_id
+WHERE
+    CAST(strftime('%Y', o.date) AS INTEGER) - CAST(strftime('%Y', c.birth_date) AS INTEGER) -
+    (CASE WHEN CAST(strftime('%m-%d', o.date) AS TEXT) < CAST(strftime('%m-%d', c.birth_date) AS TEXT)
+          THEN 1 ELSE 0 END) = 25
+    AND
+    (
+        CAST(strftime('%Y', o.date) AS INTEGER) - 25 = CAST(strftime('%Y', c.birth_date) AS INTEGER)
+        AND
+        (   CAST(strftime('%m-%d', o.date) AS TEXT) >= CAST(strftime('%m-%d', c.birth_date) AS TEXT)
+         OR CAST(strftime('%m-%d', o.date) AS TEXT) <  CAST(strftime('%m-%d', c.birth_date) AS TEXT) )
+    );
+```
+_(Dots' explanatory comments are removed here; the exact text is in `traces-td1.csv`.)_
+
+The faulty clause in each query:
+
+- **north-mini-code:** `year gap = 25 AND mm-dd(order) >= mm-dd(birth)`. This is exactly part (a), and part (b) is missing.
+- **qwen3.8-27b:** the first branch is part (a). The second branch should cover part (b), i.e. `year gap = 26 AND before the birthday`, but it says `year gap = 24 AND before the birthday`. That second branch actually selects customers aged **23**. On our database it matches 0 rows (`qwen branch 2 → 0`), so the result equals north's. The error stays latent: it would add revenue on another database.
+- **dots-3-note:** the first condition is a correct age-at-order formula. It is then combined with `AND year(order) − 25 = year(birth)`, which cuts the window back to part (a). The final `OR` is always true and has no effect.
+
+All three, then, are the same logical error, "age = difference of the years, corrected only inside the 25th calendar year", written in three different ways. The two correct models use a different approach: gpt-oss-120b compares against a date interval `date(birth, '+25 years') <= order < date(birth, '+26 years')`, and gpt-oss-20b uses the classic `year gap − (before birthday ? 1 : 0)`.
+
+### 2.4 Delta query: the exact rows, to the cent
+
+The script runs each model's WHERE clause at order-line level and compares the selected lines with the reference's. The reference selects 73 lines (558980 cents). Each of the three faulty queries selects 14 of them (119410 cents), **misses the other 59 lines (439570 cents) and adds none**. The two gpt-oss queries select the same 73 lines as the reference.
+
+Delta query (executed on `data/boutique.sqlite`):
+
+```sql
+WITH lines AS (
+  SELECT c.customer_id, c.birth_date, o.order_id, o.date,
+         o.quantity_product * p.price AS cents,
+         CAST(strftime('%Y.%m%d', o.date) - strftime('%Y.%m%d', c.birth_date) AS INTEGER) AS age_at_order,
+         CAST(strftime('%Y', o.date) AS INTEGER) - CAST(strftime('%Y', c.birth_date) AS INTEGER) AS year_gap
+  FROM customers c
+  JOIN orders o  ON c.customer_id = o.customer_id
+  JOIN product p ON o.product_id = p.product_id
+)
+SELECT customer_id, birth_date, MIN(date) AS first_order, MAX(date) AS last_order,
+       COUNT(DISTINCT order_id) AS orders, COUNT(*) AS lines, SUM(cents) AS revenue_cents
+FROM lines
+WHERE age_at_order = 25      -- counted by the reference
+  AND year_gap = 26          -- excluded by "year(order) - year(birth) = 25"
+GROUP BY customer_id, birth_date
+ORDER BY customer_id;
+```
+
+| customer_id | birth_date | first order | last order | orders | lines | revenue_cents |
+|---|---|---|---|---:|---:|---:|
+| C004 | 2000-09-25 | 2026-01-22 18:06:15 | 2026-06-15 12:30:11 | 10 | 17 | 150260 |
+| C005 | 2000-09-26 | 2026-01-06 21:23:30 | 2026-08-29 23:08:59 | 10 | 20 | 150240 |
+| C007 | 2000-11-30 | 2026-01-20 15:12:39 | 2026-08-19 03:45:43 | 6 | 18 | 118740 |
+| C022 | 2000-08-14 | 2026-04-01 18:17:09 | 2026-05-25 15:40:34 | 2 | 4 | 20330 |
+| **Total** | | | | **28** | **59** | **439570** |
+
+Check: 558980 (reference) − 119410 (shared wrong value) = **439570** = total of the delta.
+
+These four customers were born in 2000 and ordered in 2026 before their 26th birthday, so they were 25 on every one of those orders. The faulty queries see a year gap of 26 and drop them. The orders kept by the faulty queries (part (a), 14 lines, 119410 cents) come from customers born in 2001 who ordered in 2026 after their birthday.
+
+### 2.5 Independent checks that detect the error
+
+A majority vote assumes that the models' errors are independent. In this case the three wrong models come from three different families (Cohere, Qwen, Dots) and still make the same error. **Changing the panel or raising k is not a reliable check here.** It only becomes one if the panel happens to include members that write the correct formula, as the 3-of-5 vote does on C09. We retain two deterministic checks, run in section 4 of `wrong-consensus-td2.py`. Neither one needs the reference value or a vote.
+
+1. **Boundary test on fixed test data** (constructed data, not shop data). One customer born 2000-06-15 has four order lines: the day before the 25th birthday (1000 c), in the same calendar year after the birthday (10 c), in the next calendar year before the birthday (100 c), and on the 26th birthday (10000 c). The expected value, known by construction, is 110 c. The reference and both gpt-oss queries return **110**. north-mini-code, qwen3.8-27b and dots-3-note return **10**, because they miss the year-boundary order. This test runs each model's actual SQL on a 5-row database and costs nothing.
+2. **Partition invariant on the shop database.** Applying the age filter for every age from 0 to 130 must add up exactly to the revenue of all orders (2826250 c). With the reference filter the total is 2826250, so the invariant holds. With the shared faulty filter it is **907310**, so the invariant breaks. This detects the error without knowing the right answer for age 25.
+
+### 2.6 Second pattern: the shared "0" is an empty selection
+
+Our other three cases (C09, C11, C15) share the value **0**. In all six queries involved, the WHERE clause selects **0 rows**, and `COALESCE(SUM(...), 0)` turns "nothing matched" into 0, which looks like a plausible amount. The causes differ:
+
+- **C09:** north-mini-code compares the birth *year* with 25. qwen3.8-27b uses the order date instead of 2026-09-26, and its two month-day conditions contradict each other.
+- **C11:** dots-3-note tests a single birth day, 2001-12-01, instead of a one-year window (the same pattern as query M1 in the historical case DEMO-SQL-C11). north-mini-code uses date arithmetic that matches nothing.
+- **C15:** dots-3-note requires month-day ≥ and < 09-25 at the same time. north-mini-code builds invalid date strings (`birth_date || '0'`), which give NULL.
+
+So 0 attracts consensus between unrelated errors. On C09 this is enough for the fixed 2-of-3 panel to return a wrong 0.
+
+### 2.7 Consequences for the panel and the checking
+
+1. **A consensus is not a proof of correctness, even across distinct families and even with 3-of-5.** On C10 the error comes from the obvious way of breaking down an age, which several families reproduce. For the age family (F2 and F2b), a vote alone is not enough when the figure matters: add the boundary test (§2.5, check 1) or the reference, or send it for review. *(Input for Pair C's routing rule, section 3.)*
+2. **Treat a consensus on 0 as suspicious.** Ask for `COUNT(*)` with the same WHERE clause, or run it as a check. A value of 0 from 0 selected rows should cause an abstention or an escalation, not a consensus. This would have stopped the wrong 2-of-3 result on C09.
+3. **The fixed panel is not robust on F2b in our batch.** Two of its three members (north-mini-code, qwen3.8-27b) share the C10 error. 3-of-5 corrects C09 but not C10, and it abstains on C11 and C15.
+4. **Limitation:** 20 questions and a single run per cell give a hypothesis about this batch, not an error rate or a lasting ranking. A rerun at temperature 0 could produce different queries.
+
+### 2.8 Supplied synthetic case DEMO-VOTE (teaching material, not a measurement)
+
+There is one invented sale on 2026-01-01 for 100 c, and the requested period is 1 Jan inclusive to 2 Jan exclusive. Run on the one-row toy table, `sale_date > '2026-01-01'` (proposals 1 and 2) returns **0** and `>=` (proposal 3) returns **100**. The 2-of-3 vote on [0, 0, 100] returns **0, which is wrong** against the reference of 100. A strict lower bound excludes the very first day of the period. It is a boundary error, like C10, and it also ends in the attracting value 0, like §2.6.
 
 ## 3. Step 3 — The routing rule (Pair C)
 
@@ -108,8 +282,8 @@ _To fill after 17:15._
 |---|---|---|---|
 | Benjamin | A | Step 1 done together with Antonin on one computer (commits from Benjamin's account): `vote_k_sur_n`, driver `vote_td2.py`, tests, twenty-question comparison and commentary | `skeleton-multi-llm-en.py`, `vote_td2.py`, `voting-tests-en.csv`, `vote-comparison-td2.csv`, section 1 of this report |
 | Antonin | A | Step 1 done together with Benjamin on one computer (same work and files) | same as Benjamin |
-| Jean-Walter | B | _to fill_ | |
-| Noé | B | _to fill_ | |
+| Jean-Walter | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `wrong-consensus-td2.py`, `notes/td2-wrong-consensus-run.txt`, section 2 |
+| Noé | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `wrong-consensus-td2.py`, `notes/td2-wrong-consensus-run.txt`, section 2 |
 | Emma | C | _to fill_ | |
 | Bart | C | _to fill_ | |
 
@@ -126,4 +300,6 @@ _To fill (group): declared use of AI assistance for TD 2, with a link to [`promp
 | `voting-tests-en.csv` | 13 voting tests: inputs, expected and actual results (kit template `templates/voting-tests-en.csv`) |
 | `vote-comparison-td2.csv` | Twenty decisions, 2-of-3 and 3-of-5, with each model's value and verdict |
 | `notes/vote-td2-output.txt` | Full printout of `python vote_td2.py` |
+| `wrong-consensus-td2.py` | Step 2 evidence: shared wrong values, quorum verdicts (via `vote_k_sur_n`), C10 queries re-executed, delta queries, independent checks, DEMO-VOTE (no network, database read-only) |
+| `notes/td2-wrong-consensus-run.txt` | Full printout of `python wrong-consensus-td2.py` |
 | `traces-td1.csv`, `reference-td1.csv` | TD 1 inputs, unchanged |
