@@ -1,6 +1,6 @@
 # TD2 report — Vote and route
 
-**Session:** 18 November 2026 · **Course pack:** 2026-11-18-students-5 · **Data:** TD 1 traces only (`traces-td1.csv`, `reference-td1.csv`); no new network call.
+**Session:** 18 November 2026 · **Course pack:** 2026-11-18-students-5 · **Data:** TD 1 traces only (`td1/traces-td1.csv`, `td1/reference-td1.csv`); no new network call.
 
 Pairs: **A** (Step 1, k-of-n vote) Benjamin and Antonin · **B** (Step 2, wrong consensus) Jean-Walter and Noé · **C** (Step 3, routing rule) Emma and Bart.
 
@@ -17,7 +17,7 @@ Pairs: **A** (Step 1, k-of-n vote) Benjamin and Antonin · **B** (Step 2, wrong 
 
 ### 1.2 Tests
 
-`python vote_td2.py` runs 13 tests on synthetic values (nature `simulation`) and checks each expected result: **13/13 passed**. Full results in `voting-tests-en.csv`, printout in `notes/vote-td2-output.txt`.
+`python td2/A-quorum/vote_td2.py` runs 13 tests on synthetic values (nature `simulation`) and checks each expected result: **13/13 passed**. Full results in `td2/A-quorum/voting-tests-en.csv`, printout in `td2/A-quorum/vote-td2-output.txt`.
 
 | Test | Panel, k | Values (unavailable = no vote) | Expected and obtained |
 |---|---|---|---|
@@ -38,7 +38,7 @@ The four synthetic examples of the kit (`python atelier-vote.py`: agreement, dis
 
 ### 1.3 Twenty questions: fixed 2-of-3 panel versus 3-of-5 quorum
 
-Proposals are built as in `atelier-vote.py`: the **last attempt** of each member in `traces-td1.csv`; a member votes only if its SQL executed and returned a value (verdict `correct` or `incorrect`); `sql_invalid`, `sql_rejected` and `not_executed` are errors that stay in n. The reference is read **after** the decision.
+Proposals are built as in `atelier-vote.py`: the **last attempt** of each member in `td1/traces-td1.csv`; a member votes only if its SQL executed and returned a value (verdict `correct` or `incorrect`); `sql_invalid`, `sql_rejected` and `not_executed` are errors that stay in n. The reference is read **after** the decision.
 
 - **2-of-3 panel** (k = 2): A `openai/gpt-oss-120b`, C `cohere/north-mini-code:free`, D `qwen/qwen3.8-27b`.
 - **3-of-5 quorum** (k = 3): the five TD 1 models A, B `openai/gpt-oss-20b`, C, D, E `dots-studio/dots-3-note-preview:free`.
@@ -67,11 +67,11 @@ Proposals are built as in `atelier-vote.py`: the **last attempt** of each member
 | C20 | period | 1106090 | ✅ 1106090 (3) | ✅ 1106090 (5) | no |
 | **Total** | | | **14 correct, 2 wrong consensus, 4 abstentions** | **13 correct, 1 wrong consensus, 6 abstentions** | **3** |
 
-✅ consensus equal to the reference · ❌ consensus on a wrong value · ⏸ no value reaches k. Machine-readable table with each member's value and verdict: `vote-comparison-td2.csv`.
+✅ consensus equal to the reference · ❌ consensus on a wrong value · ⏸ no value reaches k. Machine-readable table with each member's value and verdict: `td2/A-quorum/vote-comparison-td2.csv`.
 
 ### 1.4 Every question where the decision changes
 
-Values from `traces-td1.csv` (last attempt), reference from `reference-td1.csv`:
+Values from `td1/traces-td1.csv` (last attempt), reference from `td1/reference-td1.csv`:
 
 - **C02 — correct → abstention.** A = 590320 ✓, D = 590320 ✓, C = `sql_invalid` (no vote). B = 0 and E = 321340 are wrong but different from each other. In the panel, A and D reach k = 2. In the quorum, the same two correct votes stay below k = 3: C's invalid SQL keeps its place in n = 5 without voting, and the two wrong models do not agree. The larger quorum loses a correct answer because it asks for one more vote than the models can give.
 - **C09 — wrong consensus → correct.** C = 0 and D = 0 (both `incorrect`) agree in the panel and outvote A = 487980 ✓: the panel returns a wrong value. In the quorum, A, B and E all return 487980 ✓ and reach k = 3; C and D stay at 2. Adding B and E, two models outside the panel, corrects the decision.
@@ -93,11 +93,11 @@ Values from `traces-td1.csv` (last attempt), reference from `reference-td1.csv`:
 ## 2. Step 2 — The wrong consensus (Pair B)
 
 
-**Evidence:** [`wrong-consensus-td2.py`](../wrong-consensus-td2.py) (offline, read-only on `data/boutique.sqlite`). Its full output is in [`notes/td2-wrong-consensus-run.txt`](../notes/td2-wrong-consensus-run.txt). Every number below comes from that output.
+**Evidence:** [`td2/B-consensus/wrong-consensus-td2.py`](../td2/B-consensus/wrong-consensus-td2.py) (offline, read-only on `kit/data/boutique.sqlite`). Its full output is in [`td2/B-consensus/td2-wrong-consensus-run.txt`](../td2/B-consensus/td2-wrong-consensus-run.txt). Every number below comes from that output.
 
-**Nature:** **real batch**. The values are the last attempt of each cell in [`traces-td1.csv`](../traces-td1.csv) (TD 1, 21 Oct 2026, `nature = real`). The model queries were re-executed today on the unchanged database and return the stored values. The synthetic DEMO-VOTE example is kept apart in §2.8 and is not counted with the measurements.
+**Nature:** **real batch**. The values are the last attempt of each cell in [`td1/traces-td1.csv`](../td1/traces-td1.csv) (TD 1, 21 Oct 2026, `nature = real`). The model queries were re-executed today on the unchanged database and return the stored values. The synthetic DEMO-VOTE example is kept apart in §2.8 and is not counted with the measurements.
 
-**Vote used:** Pair A's `Orchestrateur.vote_k_sur_n` (section 1). The script also checks every decision against an independent copy of the TD 2 contract; the two agree on all the decisions below. The quorum results match `vote-comparison-td2.csv`.
+**Vote used:** Pair A's `Orchestrateur.vote_k_sur_n` (section 1). The script also checks every decision against an independent copy of the TD 2 contract; the two agree on all the decisions below. The quorum results match `td2/A-quorum/vote-comparison-td2.csv`.
 
 ### 2.1 Shared wrong values in our batch
 
@@ -117,7 +117,7 @@ Panels: the fixed panel is `atelier-vote.py`'s, n = 3, k = 2 (gpt-oss-120b, nort
 ### 2.2 C10: identification and quorum verdicts
 
 - **Question C10** (family F2b, "age at the time of the order"): *"What is the total revenue excluding VAT, in euro cents, of the orders placed by customers who were exactly 25 years old at the time of the order?"*
-- **Independent reference:** 558980 cents. The query in `reference-td1.csv` was written by Jean-Walter and checked by Benjamin.
+- **Independent reference:** 558980 cents. The query in `td1/reference-td1.csv` was written by Jean-Walter and checked by Benjamin.
 - **Proposals** (last attempt, all HTTP 200, 1 attempt each):
 
 | Model | Provider | In fixed panel | Value | Trace verdict |
@@ -193,7 +193,7 @@ WHERE
          OR CAST(strftime('%m-%d', o.date) AS TEXT) <  CAST(strftime('%m-%d', c.birth_date) AS TEXT) )
     );
 ```
-_(Dots' explanatory comments are removed here; the exact text is in `traces-td1.csv`.)_
+_(Dots' explanatory comments are removed here; the exact text is in `td1/traces-td1.csv`.)_
 
 The faulty clause in each query:
 
@@ -207,7 +207,7 @@ All three, then, are the same logical error, "age = difference of the years, cor
 
 The script runs each model's WHERE clause at order-line level and compares the selected lines with the reference's. The reference selects 73 lines (558980 cents). Each of the three faulty queries selects 14 of them (119410 cents), **misses the other 59 lines (439570 cents) and adds none**. The two gpt-oss queries select the same 73 lines as the reference.
 
-Delta query (executed on `data/boutique.sqlite`):
+Delta query (executed on `kit/data/boutique.sqlite`):
 
 ```sql
 WITH lines AS (
@@ -242,7 +242,7 @@ These four customers were born in 2000 and ordered in 2026 before their 26th bir
 
 ### 2.5 Independent checks that detect the error
 
-A majority vote assumes that the models' errors are independent. In this case the three wrong models come from three different families (Cohere, Qwen, Dots) and still make the same error. **Changing the panel or raising k is not a reliable check here.** It only becomes one if the panel happens to include members that write the correct formula, as the 3-of-5 vote does on C09. We retain two deterministic checks, run in section 4 of `wrong-consensus-td2.py`. Neither one needs the reference value or a vote.
+A majority vote assumes that the models' errors are independent. In this case the three wrong models come from three different families (Cohere, Qwen, Dots) and still make the same error. **Changing the panel or raising k is not a reliable check here.** It only becomes one if the panel happens to include members that write the correct formula, as the 3-of-5 vote does on C09. We retain two deterministic checks, run in section 4 of `td2/B-consensus/wrong-consensus-td2.py`. Neither one needs the reference value or a vote.
 
 1. **Boundary test on fixed test data** (constructed data, not shop data). One customer born 2000-06-15 has four order lines: the day before the 25th birthday (1000 c), in the same calendar year after the birthday (10 c), in the next calendar year before the birthday (100 c), and on the 26th birthday (10000 c). The expected value, known by construction, is 110 c. The reference and both gpt-oss queries return **110**. north-mini-code, qwen3.8-27b and dots-3-note return **10**, because they miss the year-boundary order. This test runs each model's actual SQL on a 5-row database and costs nothing.
 2. **Partition invariant on the shop database.** Applying the age filter for every age from 0 to 130 must add up exactly to the revenue of all orders (2826250 c). With the reference filter the total is 2826250, so the invariant holds. With the shared faulty filter it is **907310**, so the invariant breaks. This detects the error without knowing the right answer for age 25.
@@ -270,7 +270,7 @@ There is one invented sale on 2026-01-01 for 100 c, and the requested period is 
 
 ## 3. Step 3 — The routing rule (Pair C)
 
-Pair C (Emma and Bart) worked together on this step; everything is committed from Bart's branch. The one-page rule, with the TD 1 cells that justify each line, is [`routing-rule-td2.md`](../routing-rule-td2.md). The simulator outputs are `notes/routage-td2-before.jsonl` (kit rule, 7 scenarios) and `notes/routage-td2-after.jsonl` (our rule, the same 7 plus 5 added).
+Pair C (Emma and Bart) worked together on this step; everything is committed from Bart's branch. The one-page rule, with the TD 1 cells that justify each line, is [`td2/C-routing/routing-rule-td2.md`](../td2/C-routing/routing-rule-td2.md). The simulator outputs are `td2/C-routing/routage-td2-before.jsonl` (kit rule, 7 scenarios) and `td2/C-routing/routage-td2-after.jsonl` (our rule, the same 7 plus 5 added).
 
 ### 3.1 What the TD 1 table says (observations)
 
@@ -279,7 +279,7 @@ Pair C (Emma and Bart) worked together on this step; everything is committed fro
 - Where `gpt-oss-120b` and `gpt-oss-20b` returned the same value (8 age cells) it was correct; they differ on C02 and C11.
 - The votes of Step 1 do not fix age: the 2-of-3 panel has a wrong consensus on C09 and C10, the 3-of-5 quorum on C10 (section 1.4–1.5).
 
-### 3.2 The rule (summary, details in `routing-rule-td2.md`)
+### 3.2 The rule (summary, details in `td2/C-routing/routing-rule-td2.md`)
 
 | | No age | Age |
 |---|---|---|
@@ -310,10 +310,10 @@ _To fill after 17:15._
 
 | Member | Pair | Work | Main files |
 |---|---|---|---|
-| Benjamin | A | Step 1 done together with Antonin on one computer (commits from Benjamin's account): `vote_k_sur_n`, driver `vote_td2.py`, tests, twenty-question comparison and commentary | `skeleton-multi-llm-en.py`, `vote_td2.py`, `voting-tests-en.csv`, `vote-comparison-td2.csv`, section 1 of this report |
+| Benjamin | A | Step 1 done together with Antonin on one computer (commits from Benjamin's account): `vote_k_sur_n`, driver `td2/A-quorum/vote_td2.py`, tests, twenty-question comparison and commentary | `skeleton-multi-llm-en.py`, `td2/A-quorum/vote_td2.py`, `td2/A-quorum/voting-tests-en.csv`, `td2/A-quorum/vote-comparison-td2.csv`, section 1 of this report |
 | Antonin | A | Step 1 done together with Benjamin on one computer (same work and files) | same as Benjamin |
-| Jean-Walter | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `wrong-consensus-td2.py`, `notes/td2-wrong-consensus-run.txt`, section 2 |
-| Noé | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `wrong-consensus-td2.py`, `notes/td2-wrong-consensus-run.txt`, section 2 |
+| Jean-Walter | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `kit/data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `td2/B-consensus/wrong-consensus-td2.py`, `td2/B-consensus/td2-wrong-consensus-run.txt`, section 2 |
+| Noé | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `kit/data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `td2/B-consensus/wrong-consensus-td2.py`, `td2/B-consensus/td2-wrong-consensus-run.txt`, section 2 |
 | Emma | C | _to fill_ | |
 | Bart | C | _to fill_ | |
 
@@ -326,10 +326,10 @@ _To fill (group): declared use of AI assistance for TD 2, with a link to [`promp
 | File | Content |
 |---|---|
 | `skeleton-multi-llm-en.py` | `vote_k_sur_n` completed |
-| `vote_td2.py` | Driver: tests, then the vote on the twenty questions (no network) |
-| `voting-tests-en.csv` | 13 voting tests: inputs, expected and actual results (kit template `templates/voting-tests-en.csv`) |
-| `vote-comparison-td2.csv` | Twenty decisions, 2-of-3 and 3-of-5, with each model's value and verdict |
-| `notes/vote-td2-output.txt` | Full printout of `python vote_td2.py` |
-| `wrong-consensus-td2.py` | Step 2 evidence: shared wrong values, quorum verdicts (via `vote_k_sur_n`), C10 queries re-executed, delta queries, independent checks, DEMO-VOTE (no network, database read-only) |
-| `notes/td2-wrong-consensus-run.txt` | Full printout of `python wrong-consensus-td2.py` |
-| `traces-td1.csv`, `reference-td1.csv` | TD 1 inputs, unchanged |
+| `td2/A-quorum/vote_td2.py` | Driver: tests, then the vote on the twenty questions (no network) |
+| `td2/A-quorum/voting-tests-en.csv` | 13 voting tests: inputs, expected and actual results (kit template `kit/templates/voting-tests-en.csv`) |
+| `td2/A-quorum/vote-comparison-td2.csv` | Twenty decisions, 2-of-3 and 3-of-5, with each model's value and verdict |
+| `td2/A-quorum/vote-td2-output.txt` | Full printout of `python td2/A-quorum/vote_td2.py` |
+| `td2/B-consensus/wrong-consensus-td2.py` | Step 2 evidence: shared wrong values, quorum verdicts (via `vote_k_sur_n`), C10 queries re-executed, delta queries, independent checks, DEMO-VOTE (no network, database read-only) |
+| `td2/B-consensus/td2-wrong-consensus-run.txt` | Full printout of `python td2/B-consensus/wrong-consensus-td2.py` |
+| `td1/traces-td1.csv`, `td1/reference-td1.csv` | TD 1 inputs, unchanged |

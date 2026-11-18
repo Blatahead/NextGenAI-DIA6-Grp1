@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """TD 2, Step 2 (Pair B): the wrong consensus, measured on our TD 1 traces.
 
-Offline: no network, no key. Reads `traces-td1.csv` and `reference-td1.csv`,
-opens `data/boutique.sqlite` read-only, and builds two in-memory toy databases.
+Offline: no network, no key. Reads `td1/traces-td1.csv` and `td1/reference-td1.csv`,
+opens `kit/data/boutique.sqlite` read-only, and builds two in-memory toy databases.
 
-    python wrong-consensus-td2.py            # full evidence, printed to stdout
+    python td2/B-consensus/wrong-consensus-td2.py    # from the repository root; full evidence on stdout
 
 What it prints, in order:
   1. every question where at least two TD 1 models return the same wrong value;
@@ -32,11 +32,13 @@ from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
 
-ROOT = Path(__file__).resolve().parent
-TRACES = ROOT / "traces-td1.csv"
-REFERENCES = ROOT / "reference-td1.csv"
-DB = ROOT / "data" / "boutique.sqlite"
-SCHEMA = ROOT / "schema.sql"
+ROOT = Path(__file__).resolve().parents[2]      # repository root (this file: td2/B-consensus/)
+KIT = ROOT / "kit"
+TD1 = ROOT / "td1"
+TRACES = TD1 / "traces-td1.csv"
+REFERENCES = TD1 / "reference-td1.csv"
+DB = KIT / "data" / "boutique.sqlite"
+SCHEMA = KIT / "schema.sql"
 
 FIXED_PANEL = [  # atelier-vote.py, three distinct families, k = 2
     ("groq", "openai/gpt-oss-120b"),
@@ -121,7 +123,7 @@ def local_vote(traces_question, k):
 
 def skeleton_vote():
     try:
-        spec = importlib.util.spec_from_file_location("student_skeleton", ROOT / "skeleton-multi-llm-en.py")
+        spec = importlib.util.spec_from_file_location("student_skeleton", KIT / "skeleton-multi-llm-en.py")
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module
         spec.loader.exec_module(module)

@@ -4,25 +4,25 @@ Session of 21 October 2026. Sub-group DIA6 – Group 1. Pack 2026-10-18-students
 
 ## 1. What we attempted and completed
 
-- [ ] Twenty reference queries (`reference-td1.csv`), each independently checked
+- [ ] Twenty reference queries (`td1/reference-td1.csv`), each independently checked
 - [ ] 100 base cells (20 questions × 5 models): _x_ executed, _y_ not executed
   - Operator E (Antonin, `openrouter:dots-studio/dots-3-note-preview:free`): 20/20 cells executed, 1 attempt each, 0 retry, 0 access failure (14:54–14:56).
-- [ ] Raw traces merged into `traces-td1.csv` / `traces-td1.jsonl`
-- [ ] `model-question-comparison-en.csv` and its models × questions pivot
+- [ ] Raw traces merged into `td1/traces-td1.csv` / `td1/traces-td1.jsonl`
+- [ ] `td1/model-question-comparison-en.csv` and its models × questions pivot
   - Operator E: 20 final rows in `comparison-E.csv`, explanations written for the 8 failed cells.
-- [ ] `five-model-summary-en.csv`
+- [ ] `td1/five-model-summary-en.csv`
   - Dots row completed (family results, access, N/A index and price with reasons and sources).
 
 ## 2. What worked
 
 _Results with links to the files and trace rows (`cell_id`) that support them._
 
-**Operator E — Dots 3 Note Preview (free route, AtlasCloud)** — [`traces-E.csv`](../traces-E.csv), [`comparison-E.csv`](../comparison-E.csv)
+**Operator E — Dots 3 Note Preview (free route, AtlasCloud)** — [`td1/traces/traces-E.csv`](../td1/traces/traces-E.csv), E rows of [`td1/model-question-comparison-en.csv`](../td1/model-question-comparison-en.csv)
 
 - 12/20 correct. Every **period** question (6/6: C01, C04, C05, C06, C07, C20) and every **product-list** question (4/4: C03, C12, C13, C14) is correct, including the two periods that contain no order (C06, C14: the SQL returns 0 through `COALESCE`, not NULL).
 - 2/4 **age on a reference date** questions correct (C08, C09).
 - All 20 calls returned HTTP 200 on the first attempt; latency 2.0–4.9 s; `cost_native` = 0; one `prompt_sha256` per question.
-- The OpenRouter account export ([`notes/openrouter-activity-E-2026-10-21.csv`](../notes/openrouter-activity-E-2026-10-21.csv)) lists the same 20 requests (timestamps and token counts match `state-E.jsonl`).
+- The OpenRouter account export ([`td1/notes/openrouter-activity-E-2026-10-21.csv`](../td1/notes/openrouter-activity-E-2026-10-21.csv)) lists the same 20 requests (timestamps and token counts match `td1/state/state-E.jsonl`).
 
 ## 3. What failed or remains incomplete
 
@@ -46,13 +46,13 @@ Access failure vs wrong answer: _one example of each, or the instructor-supplied
 ## 4. Decisions, limits and uncertainty
 
 - Reference conventions applied (period bounds, completed age, cents excl. VAT, 0 instead of NULL) and how each value was cross-checked.
-- Quota, retries and any reallocation or fallback cells (see `notes/run-notes-td1.md`).
+- Quota, retries and any reallocation or fallback cells (see `td1/notes/run-notes-td1.md`).
   - Operator E: allowance 50/50 free-model requests for 21 Oct before the run, 30/50 after (20 used). No retry, no reallocation, no fallback data.
 - Twenty questions establish neither a general error rate nor a permanent ranking.
   - For Dots, the age result rests on 5 single-family cells plus 5 combined cells, one run, temperature 0. The model is a preview, and its free route is announced as withdrawn on 31 Dec 2026.
 - Replayed or synthetic examples used: _none / list them explicitly_.
   - Operator E: none, all 20 rows are `real`.
-- **Incident E1 (Git line endings):** the first `--run` of E stopped before any API call because Git for Windows had converted `data/*.csv` to CRLF, which changed their SHA-256. We restored the kit files and added a `.gitattributes`. No call was lost (details in `notes/run-notes-td1.md`).
+- **Incident E1 (Git line endings):** the first `--run` of E stopped before any API call because Git for Windows had converted `kit/data/*.csv` to CRLF, which changed their SHA-256. We restored the kit files and added a `.gitattributes`. No call was lost (details in `td1/notes/run-notes-td1.md`).
 - **AI assistance:** operator E used Claude for the repository setup, the incident diagnosis, `build_comparison.py`, the failure explanations and the Dots summary row. Prompts and checks are listed in `prompts-en.md`, section 3.
 
 ## 5. Division of work
@@ -61,13 +61,13 @@ Access failure vs wrong answer: _one example of each, or the instructor-supplied
 |---|---|---|---|
 | B1 | B | HTTP 429, tokens per minute (TPM limit 8000) on the first attempt of C19 and C20 | Both retried successfully; no cell lost |
 | D1 | D | HTTP 429, output tokens per minute (OTPM limit 1000) on C16, C17, C18 (twice), C19, C20 | 5 retries (whole margin); C18 `not_executed`. Fallback requested from the instructor, **not received**; C18 is excluded from every rate |
-| D2, E1 | D, E | `check_access` / skeleton stopped before any call: CSV fingerprints differ from `data/manifest.json` | Cause: Git for Windows converted the CSV line endings (`core.autocrlf`). Kit files restored; `.gitattributes` added so it cannot recur; no API call consumed |
+| D2, E1 | D, E | `check_access` / skeleton stopped before any call: CSV fingerprints differ from `kit/data/manifest.json` | Cause: Git for Windows converted the CSV line endings (`core.autocrlf`). Kit files restored; `.gitattributes` added so it cannot recur; no API call consumed |
 
-No `Retry-After` value is stored in the traces. Details and timestamps: `notes/run-notes-td1.md`.
+No `Retry-After` value is stored in the traces. Details and timestamps: `td1/notes/run-notes-td1.md`.
 
 ## 7. Five-model summary
 
-`five-model-summary-en.csv` has one row per model: public index, paid route of the same model and prices with source and date, access used, results by family (period, age, product, combined, with the overlap view) and trace files.
+`td1/five-model-summary-en.csv` has one row per model: public index, paid route of the same model and prices with source and date, access used, results by family (period, age, product, combined, with the overlap view) and trace files.
 
 - OpenRouter models C and E: no paid route of the exact same model is documented (free route only), so prices are N/A with the reason.
 - Source rule, applied to all rows: **public index from the course portfolio** (`portefeuille-modeles-2026-09-28.csv`, one scale and one date for every model: A 11.6, B 9, D 33.7; C and E are absent, so N/A). **Prices from the portfolio when it lists a paid route of the same model** (A: OpenRouter, 0.15 / 0.60 USD per M tokens); otherwise from the provider's documentation, with source and date (B and D: Groq on-demand, read 21 Oct: 0.075 / 0.30 and 0.80 / 4.00).
@@ -80,7 +80,7 @@ No `Retry-After` value is stored in the traces. Details and timestamps: `notes/r
 - C18 of D has no result (access failure): D has 19 evaluated cells, and its combined family 4 evaluated questions out of 5.
 - Allowances, as recorded in the run notes:
   - C and E: OpenRouter free-model counters read before and after the batch (50/50 → 30/50).
-  - D: not read before the run; Groq console limit 80K tokens per 24 h, 14.5K used after the batch (equal to the 14,514 tokens of `traces/traces-D.csv`), so about 65.5K left.
+  - D: not read before the run; Groq console limit 80K tokens per 24 h, 14.5K used after the batch (equal to the 14,514 tokens of `td1/traces/traces-D.csv`), so about 65.5K left.
   - A and B: the Groq limit (200K tokens per day) before the run and "25 total API calls recorded on 21 Oct" after; the remaining allowance itself was not read. Groq limits apply to the organisation, not to the key.
 - `check_access` network runs, as recorded in the run notes: C on 16 Oct, D and E on 20 Oct, A and B on 21 Oct before their batches (preparation deadline: 18 Oct).
 - `cost_native`: 0 for every OpenRouter attempt (C, E: free routes, cost reported by the provider) and empty for every Groq attempt (A, B, D: no cost returned). An empty value is a missing measurement, not a zero cost.
@@ -91,12 +91,12 @@ Division of work, confirmed by each member:
 
 | Member | Operator | Work | Main files |
 |---|---|---|---|
-| Antonin | E (Dots, OpenRouter account 2) | Created the shared repository (kit layout, README, templates, `prompts-en.md`, run-notes and report templates); batch E and its failure causes; line-ending fix (`.gitattributes`, incident E1); OpenRouter activity evidence; checked references C11–C20 | `README.md`, `prompts-en.md`, `.gitattributes`, `traces/traces-E.csv`, `notes/openrouter-activity-E-2026-10-21.csv` |
-| Noé | A (gpt-oss-120b, Groq) | Batch A; wrote references C01–C05; A rows of the comparison and the five-model summary | `traces/traces-A.csv`, `reference-td1.csv` |
-| Jean-Walter | B (gpt-oss-20b, Groq) | Batch B and its failure causes; wrote references C06–C10; generated and committed `reference-td1.csv`; first index and price research for the five-model summary | `traces/traces-B.csv`, `reference-td1.csv`, `remplir_csv.py`, `five-model-summary-en.csv` |
-| Emma | D (qwen3.8-27b, Groq, with Bart) | Batch D; wrote references C11–C15; D failure causes and incidents D1/D2 | `traces/traces-D.csv`, D rows of `model-question-comparison-en.csv` |
-| Bart | D (with Emma) | Batch D; wrote references C16–C20; D row of the five-model summary | `traces/traces-D.csv`, `reference-td1.csv` |
-| Benjamin | C (north-mini-code, OpenRouter account 1) | Batch C and its failure causes; checked references C01–C10 and re-checked all 20; merged the common files (100-row comparison, five-model summary, `traces-td1.*`); harmonised the run notes; `traces/` and `state/` layout; this report | `traces/traces-C.csv`, `model-question-comparison-en.csv`, `five-model-summary-en.csv`, `traces-td1.csv`, `notes/run-notes-td1.md`, `reports/td1.md` |
+| Antonin | E (Dots, OpenRouter account 2) | Created the shared repository (kit layout, README, templates, `prompts-en.md`, run-notes and report templates); batch E and its failure causes; line-ending fix (`.gitattributes`, incident E1); OpenRouter activity evidence; checked references C11–C20 | `README.md`, `prompts-en.md`, `.gitattributes`, `td1/traces/traces-E.csv`, `td1/notes/openrouter-activity-E-2026-10-21.csv` |
+| Noé | A (gpt-oss-120b, Groq) | Batch A; wrote references C01–C05; A rows of the comparison and the five-model summary | `td1/traces/traces-A.csv`, `td1/reference-td1.csv` |
+| Jean-Walter | B (gpt-oss-20b, Groq) | Batch B and its failure causes; wrote references C06–C10; generated and committed `td1/reference-td1.csv`; first index and price research for the five-model summary | `td1/traces/traces-B.csv`, `td1/reference-td1.csv`, `td1/remplir_csv.py`, `td1/five-model-summary-en.csv` |
+| Emma | D (qwen3.8-27b, Groq, with Bart) | Batch D; wrote references C11–C15; D failure causes and incidents D1/D2 | `td1/traces/traces-D.csv`, D rows of `td1/model-question-comparison-en.csv` |
+| Bart | D (with Emma) | Batch D; wrote references C16–C20; D row of the five-model summary | `td1/traces/traces-D.csv`, `td1/reference-td1.csv` |
+| Benjamin | C (north-mini-code, OpenRouter account 1) | Batch C and its failure causes; checked references C01–C10 and re-checked all 20; merged the common files (100-row comparison, five-model summary, `td1/traces-td1.*`); harmonised the run notes; `td1/traces/` and `td1/state/` layout; this report | `td1/traces/traces-C.csv`, `td1/model-question-comparison-en.csv`, `td1/five-model-summary-en.csv`, `td1/traces-td1.csv`, `td1/notes/run-notes-td1.md`, `reports/td1.md` |
 
 ## 10. AI assistance
 
@@ -105,9 +105,9 @@ Every member used an AI assistant. Each prompt is logged in [`prompts-en.md`](..
 | Member | Tool | Entries | Main uses |
 |---|---|---:|---|
 | Antonin | Claude | 9 | Repository layout; diagnosis of the CRLF incident (E1); operator E run notes; `build_comparison.py` (since removed); causes of the E failures; Dots row |
-| Benjamin | Claude Code | 7 | Environment set-up; explanation of TD 1; clone of the shared repository and CRLF fix; check of the references and batch C commands; merge of the common CSVs; `traces/` / `state/` layout and merged traces |
+| Benjamin | Claude Code | 7 | Environment set-up; explanation of TD 1; clone of the shared repository and CRLF fix; check of the references and batch C commands; merge of the common CSVs; `td1/traces/` / `td1/state/` layout and merged traces |
 | Bart, with Emma (same computer) | Claude Code | 5 | Kit organisation; Git help; diagnosis of the CRLF incident (D2); reading of the D traces and causes; Groq quota reading |
-| Jean-Walter | Gemini, Claude | 3 | Restoring the original `data/` files; CSV of the final attempts; diagnosis of the B age failures |
+| Jean-Walter | Gemini, Claude | 3 | Restoring the original `kit/data/` files; CSV of the final attempts; diagnosis of the B age failures |
 | Noé | Gemini | 3 | Clarification of the instructions (allowance, traces, batch command); reading of the terminal output; Git status before pushing |
 
 No reference amount comes from a model: the 20 references are SQL results on the database, checked independently (section 2).
@@ -115,17 +115,17 @@ No reference amount comes from a model: the 20 references are SQL results on the
 ## 11. Next steps
 
 1. TD 2 (18 Nov): complete `vote_k_sur_n`, test it on these traces (no new network batch required) and analyse the C10 wrong agreement.
-2. TD 2: write the routing rule with `templates/routing-rule-en.md` and run it on the seven scenarios of `atelier-routage.py`.
+2. TD 2: write the routing rule with `kit/templates/routing-rule-en.md` and run it on the seven scenarios of `atelier-routage.py`.
 
 ## 12. Evidence
 
 | File | Content |
 |---|---|
-| `reference-td1.csv` | 20 reference queries and values |
-| `traces-td1.csv`, `traces-td1.jsonl` | All 107 attempts of the five batches merged (one CSV header; one JSON line per attempt), rows copied unchanged from the source files; `python skeleton-multi-llm-en.py --rates` reads `traces-td1.jsonl` by default |
-| `traces/traces-{A..E}.csv`, `state/state-{A..E}.jsonl` | Source files per operator, kept unchanged |
-| `model-question-comparison-en.csv` | 100 final rows with status, value, reference, explanation, trace file and `cell_id` |
-| `five-model-summary-en.csv` | One row per model: index, prices, access, family results |
-| `notes/run-notes-td1.md` | Allocation, commands, counters, incidents |
-| `notes/openrouter-activity-E-2026-10-21.csv` | OpenRouter activity export of operator E: allowance evidence (20 requests on 21 Oct, $0) |
+| `td1/reference-td1.csv` | 20 reference queries and values |
+| `td1/traces-td1.csv`, `td1/traces-td1.jsonl` | All 107 attempts of the five batches merged (one CSV header; one JSON line per attempt), rows copied unchanged from the source files; `python skeleton-multi-llm-en.py --rates` reads `td1/traces-td1.jsonl` by default |
+| `td1/traces/traces-{A..E}.csv`, `td1/state/state-{A..E}.jsonl` | Source files per operator, kept unchanged |
+| `td1/model-question-comparison-en.csv` | 100 final rows with status, value, reference, explanation, trace file and `cell_id` |
+| `td1/five-model-summary-en.csv` | One row per model: index, prices, access, family results |
+| `td1/notes/run-notes-td1.md` | Allocation, commands, counters, incidents |
+| `td1/notes/openrouter-activity-E-2026-10-21.csv` | OpenRouter activity export of operator E: allowance evidence (20 requests on 21 Oct, $0) |
 | `prompts-en.md` | Experiment prompt as used, AI-assistance log |

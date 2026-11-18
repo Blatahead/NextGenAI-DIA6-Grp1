@@ -14,7 +14,7 @@ PASS  T12-k-not-majority-of-5    k=2 values=[100, 100, 100, 100, 100] -> ValueEr
 PASS  T13-duplicate-route        k=2 values=[100, 100, 120] -> ValueError: duplicate member groq:openai/gpt-oss-120b: a duplicate is not a second vote
 13/13 tests passed
 
-== Twenty questions, real TD 1 traces (traces-td1.csv): 2-of-3 panel (A, C, D) vs 3-of-5 quorum (A-E)
+== Twenty questions, real TD 1 traces (td1/traces-td1.csv): 2-of-3 panel (A, C, D) vs 3-of-5 quorum (A-E)
 
 case  type                                             2-of-3                       3-of-5                       changed
 C01   period                                           correct 792800 (3)           correct 792800 (5)           no

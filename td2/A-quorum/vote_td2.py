@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """TD 2, Step 1 (Pair A): driver of Orchestrateur.vote_k_sur_n. No network, no key.
 
-    python vote_td2.py
+    python td2/A-quorum/vote_td2.py        # from the repository root (works from any folder)
+
+Reads the kit in kit/ (skeleton, atelier-vote.py, configuration, questions) and
+the TD 1 inputs in td1/ (traces-td1.csv, reference-td1.csv). Writes next to itself:
 
 1. Runs the voting tests (synthetic values) and checks each expected result;
    writes voting-tests-en.csv.
-2. Applies the vote to the twenty questions of traces-td1.csv: fixed 2-of-3 panel
-   (k = 2) and 3-of-5 quorum over the five TD 1 models (k = 3); writes
+2. Applies the vote to the twenty questions of td1/traces-td1.csv: fixed 2-of-3
+   panel (k = 2) and 3-of-5 quorum over the five TD 1 models (k = 3); writes
    vote-comparison-td2.csv.
-3. Prints everything and saves the printout in notes/vote-td2-output.txt.
+3. Prints everything and saves the printout in vote-td2-output.txt.
 
 Proposals are built as in atelier-vote.py: last attempt of each member, a vote
 only when the SQL executed and returned a value (verdict correct or incorrect);
@@ -24,17 +27,20 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 
-HERE = Path(__file__).resolve().parent
-TRACES = HERE / "traces-td1.csv"
-REFERENCE = HERE / "reference-td1.csv"
-QUESTIONS = HERE / "questions-td1.json"
+HERE = Path(__file__).resolve().parent          # td2/A-quorum/
+REPO = HERE.parents[1]
+KIT = REPO / "kit"
+TD1 = REPO / "td1"
+TRACES = TD1 / "traces-td1.csv"
+REFERENCE = TD1 / "reference-td1.csv"
+QUESTIONS = KIT / "questions-td1.json"
 OUT_TESTS = HERE / "voting-tests-en.csv"
 OUT_TABLE = HERE / "vote-comparison-td2.csv"
-OUT_LOG = HERE / "notes" / "vote-td2-output.txt"
+OUT_LOG = HERE / "vote-td2-output.txt"
 
 
 def load_module(name: str, filename: str):
-    spec = importlib.util.spec_from_file_location(name, HERE / filename)
+    spec = importlib.util.spec_from_file_location(name, KIT / filename)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
@@ -44,7 +50,7 @@ def load_module(name: str, filename: str):
 SKELETON = load_module("student_skeleton", "skeleton-multi-llm-en.py")
 PANEL_3 = load_module("atelier_vote", "atelier-vote.py").PANEL          # same fixed panel as the workshop
 ALL_5 = [(m["gate"], m["identifiant_exact"])
-         for m in json.loads((HERE / "modeles-autorises.json").read_text(encoding="utf-8"))["modeles"]]
+         for m in json.loads((KIT / "modeles-autorises.json").read_text(encoding="utf-8"))["modeles"]]
 SHORT = {"openai/gpt-oss-120b": "A", "openai/gpt-oss-20b": "B", "cohere/north-mini-code:free": "C",
          "qwen/qwen3.8-27b": "D", "dots-studio/dots-3-note-preview:free": "E"}
 
@@ -104,7 +110,7 @@ def run_tests():
                                                 for m, v in zip(members, values)),
                      "unavailable_members": "; ".join(label(m) for m, v in zip(members, values) if v is None) or "none",
                      "expected_result_or_abstention": exp_text, "actual_result": text,
-                     "agreeing_members": agreeing, "evidence_file": "notes/vote-td2-output.txt"})
+                     "agreeing_members": agreeing, "evidence_file": "td2/A-quorum/vote-td2-output.txt"})
     return rows, failures
 
 
@@ -187,14 +193,14 @@ def main():
         print("== Voting tests (synthetic values, nature = simulation)")
         tests, failures = run_tests()
         print(f"{len(tests) - failures}/{len(tests)} tests passed")
-        print("\n== Twenty questions, real TD 1 traces (traces-td1.csv): 2-of-3 panel (A, C, D) vs 3-of-5 quorum (A-E)")
+        print("\n== Twenty questions, real TD 1 traces (td1/traces-td1.csv): 2-of-3 panel (A, C, D) vs 3-of-5 quorum (A-E)")
         table = run_table()
     text = buffer.getvalue()
     print(text, end="")
     write_csv(OUT_TESTS, tests)
     write_csv(OUT_TABLE, table)
     OUT_LOG.write_text(text, encoding="utf-8")
-    print(f"\nwritten: {OUT_TESTS.name}, {OUT_TABLE.name}, notes/{OUT_LOG.name}")
+    print(f"\nwritten in td2/A-quorum/: {OUT_TESTS.name}, {OUT_TABLE.name}, {OUT_LOG.name}")
     return 1 if failures else 0
 
 

@@ -1,6 +1,6 @@
 # Routing rule — sub-group DIA6-G1 (TD 2, step 3, pair C: Emma and Bart)
 
-Written from our TD 1 table (`traces-td1.csv`, last attempt per cell, 20 questions × 5 models) before reading the simulator. Applies to the shop revenue questions only. **A batch-specific hypothesis, not a general error rate, a ranking, or a guarantee of the quorum.**
+Written from our TD 1 table (`td1/traces-td1.csv`, last attempt per cell, 20 questions × 5 models) before reading the simulator. Applies to the shop revenue questions only. **A batch-specific hypothesis, not a general error rate, a ranking, or a guarantee of the quorum.**
 
 ## 1. The two families that matter, and what TD 1 shows
 
@@ -14,7 +14,7 @@ Written from our TD 1 table (`traces-td1.csv`, last attempt per cell, 20 questio
 
 Cell ids in the traces: `groq:openai/gpt-oss-120b:Cxx`, etc. Every failure of every model (wrong value, invalid or rejected SQL, one unexecuted cell) is on an age question. Latency (median, answered calls): qwen 571 ms, gpt-oss-20b 573 ms, gpt-oss-120b 934 ms, north-mini 1759 ms, dots 2757 ms.
 
-**Two facts drive the rule.** (a) On the 10 non-age cells all five models are correct, so the cheapest route is enough. (b) On the 10 age cells only gpt-oss-120b is correct every time; whenever gpt-oss-120b and gpt-oss-20b returned the same value (8 cells: C08, C09, C10, C15–C19) it was correct; they differ on C02 and C11, where gpt-oss-20b is the wrong one. **Voting does not fix age**: the fixed 2-of-3 panel (gpt-oss-120b, north-mini, qwen) returns a wrong consensus on C09 (value 0, north-mini and qwen) and on C10 (119410), and the 3-of-5 quorum keeps C10 wrong with 3 votes (`vote-comparison-td2.csv`, `reports/td2.md` §1.4–1.5).
+**Two facts drive the rule.** (a) On the 10 non-age cells all five models are correct, so the cheapest route is enough. (b) On the 10 age cells only gpt-oss-120b is correct every time; whenever gpt-oss-120b and gpt-oss-20b returned the same value (8 cells: C08, C09, C10, C15–C19) it was correct; they differ on C02 and C11, where gpt-oss-20b is the wrong one. **Voting does not fix age**: the fixed 2-of-3 panel (gpt-oss-120b, north-mini, qwen) returns a wrong consensus on C09 (value 0, north-mini and qwen) and on C10 (119410), and the 3-of-5 quorum keeps C10 wrong with 3 votes (`td2/A-quorum/vote-comparison-td2.csv`, `reports/td2.md` §1.4–1.5).
 
 ## 2. The rule
 
@@ -34,11 +34,11 @@ Cell ids in the traces: `groq:openai/gpt-oss-120b:Cxx`, etc. Every failure of ev
 | Figure shown to a customer (complaint, loss of trust) | 2-of-3 quorum on `gpt-oss-20b`, `north-mini`, `dots` (k = 2, other providers, all free) | **2-of-2**: `gpt-oss-120b` and `gpt-oss-20b` must agree (k = 2); disagreement goes to the reference query and human review |
 | Amount paid out (financial loss) | reference query (written and checked by people) and human review | same: a model never decides alone, and agreement between models is not a proof |
 
-**Cost basis:** USD excluding tax per request for 2,000 input + 500 output tokens: free routes 0, `gpt-oss-20b` on-demand 0.0003, `gpt-oss-120b` on-demand 0.0006 (prices from `five-model-summary-en.csv`; no paid route is documented for `north-mini` or `dots`, so they have no paid fallback). **Assumptions, not measured:** budget 0.01 USD per request; acceptable delay 120 minutes for a request that can wait, 5 minutes for an urgent one; quota availability is supplied by each scenario.
+**Cost basis:** USD excluding tax per request for 2,000 input + 500 output tokens: free routes 0, `gpt-oss-20b` on-demand 0.0003, `gpt-oss-120b` on-demand 0.0006 (prices from `td1/five-model-summary-en.csv`; no paid route is documented for `north-mini` or `dots`, so they have no paid fallback). **Assumptions, not measured:** budget 0.01 USD per request; acceptable delay 120 minutes for a request that can wait, 5 minutes for an urgent one; quota availability is supplied by each scenario.
 
 ## 3. Simulator (`atelier-routage.py`, no call, no key)
 
-`notes/routage-td2-before.jsonl` (kit rule, 7 scenarios) and `notes/routage-td2-after.jsonl` (our rule, same 7 plus 5 added). Template rows R1–R5 (`templates/routing-rule-en.md`):
+`td2/C-routing/routage-td2-before.jsonl` (kit rule, 7 scenarios) and `td2/C-routing/routage-td2-after.jsonl` (our rule, same 7 plus 5 added). Template rows R1–R5 (`kit/templates/routing-rule-en.md`):
 
 | ID | Scenario | Action | Resource and reason |
 |---|---|---|---|
