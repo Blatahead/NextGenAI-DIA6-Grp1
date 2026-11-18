@@ -1,0 +1,42 @@
+== Voting tests (synthetic values, nature = simulation)
+PASS  T1-agreement               k=2 values=[100, 100, 120] -> consensus value=100 votes=2
+PASS  T2-disagreement            k=2 values=[100, 110, 120] -> abstention (largest count 1)
+PASS  T3-one-unavailable         k=2 values=[100, 100, None] -> consensus value=100 votes=2
+PASS  T4-two-unavailable         k=2 values=[100, None, None] -> abstention (largest count 1)
+PASS  T5-all-unavailable         k=2 values=[None, None, None] -> abstention (largest count 0)
+PASS  T6-wrong-consensus-zero    k=2 values=[0, 0, 100] -> consensus value=0 votes=2
+PASS  T7-unanimity-k3            k=3 values=[100, 100, 120] -> abstention (largest count 2)
+PASS  T8-quorum-3of5             k=3 values=[100, 100, 100, 120, None] -> consensus value=100 votes=3
+PASS  T9-quorum-3of5-split       k=3 values=[100, 100, 120, 120, None] -> abstention (largest count 2)
+PASS  T10-k-too-small            k=1 values=[100, 100, 100] -> ValueError: k must be a strict majority of n: n // 2 < k <= n (n=3, k=1)
+PASS  T11-k-too-large            k=4 values=[100, 100, 100] -> ValueError: k must be a strict majority of n: n // 2 < k <= n (n=3, k=4)
+PASS  T12-k-not-majority-of-5    k=2 values=[100, 100, 100, 100, 100] -> ValueError: k must be a strict majority of n: n // 2 < k <= n (n=5, k=2)
+PASS  T13-duplicate-route        k=2 values=[100, 100, 120] -> ValueError: duplicate member groq:openai/gpt-oss-120b: a duplicate is not a second vote
+13/13 tests passed
+
+== Twenty questions, real TD 1 traces (traces-td1.csv): 2-of-3 panel (A, C, D) vs 3-of-5 quorum (A-E)
+
+case  type                                             2-of-3                       3-of-5                       changed
+C01   period                                           correct 792800 (3)           correct 792800 (5)           no
+C02   age on a reference date                          correct 590320 (2)           abstention  (2)              yes
+C03   product list                                     correct 936350 (3)           correct 936350 (5)           no
+C04   period                                           correct 2826250 (3)          correct 2826250 (5)          no
+C05   period                                           correct 38480 (3)            correct 38480 (5)            no
+C06   period                                           correct 0 (3)                correct 0 (5)                no
+C07   period                                           correct 13970 (3)            correct 13970 (5)            no
+C08   age on a reference date                          correct 605580 (2)           correct 605580 (4)           no
+C09   age on a reference date                          wrong consensus 0 (2)        correct 487980 (3)           yes
+C10   age at the time of the order                     wrong consensus 119410 (2)   wrong consensus 119410 (3)   no
+C11   age on a reference date                          correct 446690 (2)           abstention  (2)              yes
+C12   product list                                     correct 1666490 (3)          correct 1666490 (5)          no
+C13   product list                                     correct 107740 (3)           correct 107740 (5)           no
+C14   product list                                     correct 0 (3)                correct 0 (5)                no
+C15   period + age on a reference date                 abstention  (1)              abstention  (2)              no
+C16   age on a reference date + product list           correct 376740 (2)           correct 376740 (3)           no
+C17   period + age on a reference date + product list  abstention  (1)              abstention  (2)              no
+C18   period + age at the time of the order            abstention  (1)              abstention  (2)              no
+C19   period + age on a reference date + product list  abstention  (1)              abstention  (2)              no
+C20   period                                           correct 1106090 (3)          correct 1106090 (5)          no
+panel_2of3: {'correct': 14, 'wrong consensus': 2, 'abstention': 4}
+quorum_3of5: {'correct': 13, 'wrong consensus': 1, 'abstention': 6}
+decisions changed: ['C02', 'C09', 'C11']
