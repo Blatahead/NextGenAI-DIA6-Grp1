@@ -1,0 +1,108 @@
+[vote] skeleton vote_k_sur_n used, cross-checked against the contract on every call.
+
+==============================================================================
+1. Shared wrong values in the TD 1 traces (100 cells, last attempt per cell)
+==============================================================================
+  C09: value 0 returned by north-mini-code, qwen3.8-27b; reference 487980
+  C10: value 119410 returned by north-mini-code, qwen3.8-27b, dots-3-note; reference 558980
+  C11: value 0 returned by north-mini-code, dots-3-note; reference 446690
+  C15: value 0 returned by north-mini-code, dots-3-note; reference 168680
+
+==============================================================================
+2. Declared quorums (the vote does not see the reference)
+==============================================================================
+C09 (reference 487980)
+  fixed panel 2-of-3: [gpt-oss-120b=487980, north-mini-code=0, qwen3.8-27b=0]
+    -> consensus 0 (2 votes: north-mini-code, qwen3.8-27b) -> WRONG
+  five models 3-of-5: [gpt-oss-120b=487980, gpt-oss-20b=487980, north-mini-code=0, qwen3.8-27b=0, dots-3-note=487980]
+    -> consensus 487980 (3 votes: gpt-oss-120b, gpt-oss-20b, dots-3-note) -> matches reference
+C10 (reference 558980)
+  fixed panel 2-of-3: [gpt-oss-120b=558980, north-mini-code=119410, qwen3.8-27b=119410]
+    -> consensus 119410 (2 votes: north-mini-code, qwen3.8-27b) -> WRONG
+  five models 3-of-5: [gpt-oss-120b=558980, gpt-oss-20b=558980, north-mini-code=119410, qwen3.8-27b=119410, dots-3-note=119410]
+    -> consensus 119410 (3 votes: north-mini-code, qwen3.8-27b, dots-3-note) -> WRONG
+C11 (reference 446690)
+  fixed panel 2-of-3: [gpt-oss-120b=446690, north-mini-code=0, qwen3.8-27b=446690]
+    -> consensus 446690 (2 votes: gpt-oss-120b, qwen3.8-27b) -> matches reference
+  five models 3-of-5: [gpt-oss-120b=446690, gpt-oss-20b=322160, north-mini-code=0, qwen3.8-27b=446690, dots-3-note=0]
+    -> ABSTAIN (largest count 2)
+C15 (reference 168680)
+  fixed panel 2-of-3: [gpt-oss-120b=168680, north-mini-code=0, qwen3.8-27b=138920]
+    -> ABSTAIN (largest count 1)
+  five models 3-of-5: [gpt-oss-120b=168680, gpt-oss-20b=168680, north-mini-code=0, qwen3.8-27b=138920, dots-3-note=0]
+    -> ABSTAIN (largest count 2)
+
+==============================================================================
+3. C10 (main case): queries re-executed on data/boutique.sqlite (read-only)
+==============================================================================
+reference-td1.csv          -> 558980  (stored reference 558980)
+reference selects 73 order lines, 558980 cents
+gpt-oss-120b     trace  558980 (correct  ) re-run  558980 | lines  73, missed  0 =      0 c, added 0 = 0 c
+gpt-oss-20b      trace  558980 (correct  ) re-run  558980 | lines  73, missed  0 =      0 c, added 0 = 0 c
+north-mini-code  trace  119410 (incorrect) re-run  119410 | lines  14, missed 59 = 439570 c, added 0 = 0 c
+qwen3.8-27b      trace  119410 (incorrect) re-run  119410 | lines  14, missed 59 = 439570 c, added 0 = 0 c
+dots-3-note      trace  119410 (incorrect) re-run  119410 | lines  14, missed 59 = 439570 c, added 0 = 0 c
+
+Customer-level delta query (rows counted by the reference, missed by the three agreeing queries):
+WITH lines AS (
+  SELECT c.customer_id, c.birth_date, o.order_id, o.date,
+         o.quantity_product * p.price AS cents,
+         CAST(strftime('%Y.%m%d', o.date) - strftime('%Y.%m%d', c.birth_date) AS INTEGER) AS age_at_order,
+         CAST(strftime('%Y', o.date) AS INTEGER) - CAST(strftime('%Y', c.birth_date) AS INTEGER) AS year_gap
+  FROM customers c
+  JOIN orders o  ON c.customer_id = o.customer_id
+  JOIN product p ON o.product_id = p.product_id
+)
+SELECT customer_id, birth_date, MIN(date) AS first_order, MAX(date) AS last_order,
+       COUNT(DISTINCT order_id) AS orders, COUNT(*) AS lines, SUM(cents) AS revenue_cents
+FROM lines
+WHERE age_at_order = 25      -- counted by the reference
+  AND year_gap = 26          -- excluded by "year(order) - year(birth) = 25"
+GROUP BY customer_id, birth_date
+ORDER BY customer_id;
+customer_id birth_date  first order          last order            orders lines    cents
+C004        2000-09-25  2026-01-22 18:06:15  2026-06-15 12:30:11       10    17   150260
+C005        2000-09-26  2026-01-06 21:23:30  2026-08-29 23:08:59       10    20   150240
+C007        2000-11-30  2026-01-20 15:12:39  2026-08-19 03:45:43        6    18   118740
+C022        2000-08-14  2026-04-01 18:17:09  2026-05-25 15:40:34        2     4    20330
+TOTAL                                                                  28         439570
+check: reference 558980 - shared wrong value 119410 = 439570; delta total = 439570
+
+Split of the reference set (age 25 at the order) by calendar-year gap:
+  year gap 25, birthday reached in the order's calendar year: True  ->  14 lines, 119410 cents
+  year gap 26, birthday reached in the order's calendar year: False ->  59 lines, 439570 cents
+
+==============================================================================
+4. Independent checks that detect the shared C10 error (no vote, no reference value)
+==============================================================================
+4a. Boundary fixture: one invented customer born 2000-06-15, four invented order lines.
+    Constructed test data, not shop data. Expected value by construction: 10 + 100 = 110 cents.
+    reference query         -> 110
+    gpt-oss-120b            -> 110
+    gpt-oss-20b             -> 110
+    north-mini-code         -> 10
+    qwen3.8-27b             -> 10
+    dots-3-note             -> 10
+
+4b. Partition invariant on the shop database: summing an age filter over every age 0..130
+    must give the revenue of all orders, whatever the right answer for age 25 is.
+    reference age filter   sum over ages =  2826250  vs all orders 2826250  -> invariant holds
+    shared faulty filter   sum over ages =   907310  vs all orders 2826250  -> INVARIANT BROKEN
+
+==============================================================================
+5. Shared wrong value 0: is it an empty selection turned into 0 by COALESCE?
+==============================================================================
+  C09 north-mini-code  value       0, rows selected by its WHERE: 0
+  C09 qwen3.8-27b      value       0, rows selected by its WHERE: 0
+  C11 north-mini-code  value       0, rows selected by its WHERE: 0
+  C11 dots-3-note      value       0, rows selected by its WHERE: 0
+  C15 north-mini-code  value       0, rows selected by its WHERE: 0
+  C15 dots-3-note      value       0, rows selected by its WHERE: 0
+
+==============================================================================
+6. DEMO-VOTE (supplied SYNTHETIC case: invented sale, not a model output, not shop data)
+==============================================================================
+  variant '>'  (proposals 1 and 2) -> 0
+  variant '>=' (proposal 3)        -> 100
+  reference (1 Jan inclusive)      -> 100
+  2-of-3 on [0, 0, 100]: consensus 0 (2 votes: synthetic:proposal-1, synthetic:proposal-2) -> WRONG
