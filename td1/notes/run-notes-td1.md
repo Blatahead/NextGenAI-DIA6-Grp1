@@ -2,9 +2,9 @@
 
 Allocation, quota counters and commands actually run. Counted separately: initial calls (base batch), access checks, retries. A new key adds no capacity.
 
-Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc` column of each trace when available; counts come from the raw traces (`traces/traces-X.csv`). A value that no trace or console records is marked _to fill (name)_ and is not guessed.
+Conventions of this file: times are Paris time (UTC+2), taken from the `date_utc` column of each trace when available; counts come from the raw traces (`td1/traces/traces-X.csv`). A value that no trace or console records is marked _to fill (name)_ and is not guessed.
 
-File layout: after the batch (21 Oct), the raw files were moved without any change of content: `traces-X.csv` → `traces/traces-X.csv`, `state-X.jsonl` → `state/state-X.jsonl`. The commands below are shown exactly as they were run, with the former paths. To resume or read an operator's batch now, pass the new paths, e.g. `--state state/state-C.jsonl --out traces/traces-C.csv`.
+File layout: the raw files were moved twice, without any change of content. After the batch (21 Oct): `traces-X.csv` → `traces/traces-X.csv`, `state-X.jsonl` → `state/state-X.jsonl`. On 18 Nov the repository was reorganised by session: TD 1 files into `td1/` (now `td1/traces/traces-X.csv`, `td1/state/state-X.jsonl`) and the course kit into `kit/` (database now `kit/data/boutique.sqlite`). The commands below are shown exactly as they were run, with the former paths. To resume or read an operator's batch now, from the repository root: `python kit/skeleton-multi-llm-en.py --rates --state td1/state/state-C.jsonl`.
 
 ## Allocation and allowance (filled at 14:00–14:15)
 
@@ -13,7 +13,7 @@ File layout: after the batch (21 Oct), the raw files were moved without any chan
 | A | Noé | `groq:openai/gpt-oss-120b` | Groq | 200k tokens per day |1 run on 21 Oct (3 Groq+2OR) | 20 | 5 |
 | B | Jean-Walter | `groq:openai/gpt-oss-20b` | Groq | 200k tokens per day | 1 run (3 Groq + 2 OR) on 21 Oct | 20 | 5 |
 | C | Benjamin | `openrouter:cohere/north-mini-code:free` | OpenRouter (account 1) | 50/50 free-model requests for 21 Oct (`/api/v1/key`, 14:45, free tier, $0 spent) | 1 run on 16 Oct (3 Groq + 2 OR), none on 21 Oct | 20 | 5 |
-| D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | Not recorded before the run. Groq console limit: 80K tokens per 24 h; the 14.5K used shown afterwards equals this run's tokens (14,514 in `traces/traces-D.csv`), so about 80K were available | 1 run on 20 Oct, 5/5 OK (3 Groq calls on this account + 2 OpenRouter) | 20 | 5 |
+| D | Emma, Bart | `groq:qwen/qwen3.8-27b` | Groq | Not recorded before the run. Groq console limit: 80K tokens per 24 h; the 14.5K used shown afterwards equals this run's tokens (14,514 in `td1/traces/traces-D.csv`), so about 80K were available | 1 run on 20 Oct, 5/5 OK (3 Groq calls on this account + 2 OpenRouter) | 20 | 5 |
 | E | Antonin | `openrouter:dots-studio/dots-3-note-preview:free` | OpenRouter (account 2, ≠ C) | 50/50 free-model requests for 21 Oct (OpenRouter Activity, limit 50/day without purchased credits) | 1 run on 20 Oct (3 Groq + 2 OR); an earlier run that day stopped before any call (missing keys) | 20 | 5 |
 
 ## Commands run
@@ -25,7 +25,7 @@ File layout: after the batch (21 Oct), the raw files were moved without any chan
 | 14:47–14:49 | D | `python skeleton-multi-llm-en.py --run --models groq:qwen/qwen3.8-27b --state state-D.jsonl --out traces-D.csv` | 20/20 cells, 25 attempts: 13 correct, 5 incorrect, 1 sql_rejected (C19), 1 not_executed (C18); 6 × HTTP 429 (incident D1) |
 | 14:49–14:51 | B | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-20b --cases C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20 --state state-B.jsonl --out traces-B.csv` | 20/20 cells, 22 attempts: 18 correct, 2 incorrect (C02, C11); 2 × HTTP 429 on C19 and C20, both solved by the retry (incident B1) |
 | ~14:50 | E | `python skeleton-multi-llm-en.py --run --models openrouter:dots-studio/dots-3-note-preview:free --state state-E.jsonl --out traces-E.csv` | Stopped before any call: CSV fingerprints differ from `data/manifest.json` (incident E1); 0 calls |
-| 14:54–14:56 | E | same command, after restoring `data/` | 20/20 cells: 12 correct, 7 incorrect (C02, C10, C11, C15, C16, C18, C19), 1 sql_invalid (C17); all HTTP 200 |
+| 14:54–14:56 | E | same command, after restoring `kit/data/` | 20/20 cells: 12 correct, 7 incorrect (C02, C10, C11, C15, C16, C18, C19), 1 sql_invalid (C17); all HTTP 200 |
 | 14:55 | A | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C03 --state state-A.jsonl --out traces-A.csv` | 2/2 cells: 2 correct; all HTTP 200 |
 | 14:55–14:57 | A | `python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --cases C01,C02,C03,C04,C05,C06,C07,C08,C09,C10,C11,C12,C13,C14,C15,C16,C17,C18,C19,C20 --state state-A.jsonl --out traces-A.csv` | 18 new cells (C01, C03 skipped), 20/20 in total: 20 correct; all HTTP 200 |
 
@@ -37,7 +37,7 @@ File layout: after the batch (21 Oct), the raw files were moved without any chan
 | B | 20 | 2 (C19, C20) | 1 run (3 Groq + 2 OR) on 21 Oct | Free Tier Active, 25 total API calls recorded on 21 Oct | none |
 | C | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent | none |
 | D | 20 | 5 (C16, C17, C18, C19, C20) | 1 run on 20 Oct, 5/5 OK (3 Groq + 2 OR) | About 65.5K of 80K tokens per 24 h left (Groq console, read after the batch: 14.5K used) | C18 `not_executed` (HTTP 429 twice): instructor fallback requested, not used so far |
-| E | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent (resets at 00:00 UTC; evidence `notes/openrouter-activity-E-2026-10-21.csv`) | none |
+| E | 20 | 0 | 0 on 21 Oct | 30/50 free-model requests for 21 Oct, $0 spent (resets at 00:00 UTC; evidence `td1/notes/openrouter-activity-E-2026-10-21.csv`) | none |
 | **Total** | **100** | **7** | counted per operator above | | **1 cell (D, C18)** |
 
 Total HTTP attempts on 21 Oct: 107 (100 initial calls + 7 retries). Traces: A 20 rows, B 22, C 20, D 25, E 20. Note: the notes once gave 22 initial calls for A; the trace shows 20 calls in two runs (C01 and C03 first, then the 18 others), so 22 was a count of runs plus calls, not of calls.
@@ -50,28 +50,28 @@ _HTTP status, `Retry-After`, timeouts, reallocations, fallback data used (label:
 
 ### A — no incident
 
-20 attempts, all HTTP 200, no 429, no timeout, no retry; 20/20 correct. Traces: `state/state-A.jsonl`, `traces/traces-A.csv` (nature `real`).
+20 attempts, all HTTP 200, no 429, no timeout, no retry; 20/20 correct. Traces: `td1/state/state-A.jsonl`, `td1/traces/traces-A.csv` (nature `real`).
 
 ### B1 — HTTP 429 on tokens per minute (operator B, 14:50–14:51)
 
 - **Observed:** first attempt of C19 (12:50:49 UTC) and C20 (12:50:56 UTC) refused with HTTP 429 "Rate limit reached for model `openai/gpt-oss-20b` ... on tokens per minute (TPM): Limit 8000" (used 6807 + requested 1344 for C19, used 6975 + requested 1052 for C20).
 - **Retry:** one retry each, a few seconds later, HTTP 200; final verdict correct for both. `Retry-After` is not stored in the trace.
-- **Impact:** 2 retries out of the 5-call margin; no cell lost. Nature: real. Traces: `state/state-B.jsonl`, `traces/traces-B.csv`.
+- **Impact:** 2 retries out of the 5-call margin; no cell lost. Nature: real. Traces: `td1/state/state-B.jsonl`, `td1/traces/traces-B.csv`.
 
 ### C — no access incident
 
-20 attempts, all HTTP 200, no 429, no timeout, no retry. One answer was invalid SQL (C02, `syntax_error near "AS"`): a model error, not an access error. In the console the C14 verdict line was not printed, but `traces/traces-C.csv` contains it (correct, 0 = 0). Traces: `state/state-C.jsonl`, `traces/traces-C.csv` (nature `real`, one prompt fingerprint per question).
+20 attempts, all HTTP 200, no 429, no timeout, no retry. One answer was invalid SQL (C02, `syntax_error near "AS"`): a model error, not an access error. In the console the C14 verdict line was not printed, but `td1/traces/traces-C.csv` contains it (correct, 0 = 0). Traces: `td1/state/state-C.jsonl`, `td1/traces/traces-C.csv` (nature `real`, one prompt fingerprint per question).
 
 ### D1 — HTTP 429 on output tokens per minute (operator D, 14:48–14:49)
 
 - **Observed:** HTTP 429 "Rate limit reached ... on output tokens per minute (OTPM): Limit 1000" on C16, C17, C18 (twice), C19 and C20: 6 responses. The first came 53 s after the first call. `Retry-After` is not stored in the trace.
 - **Retry:** the retry worked for C16, C17, C19 and C20 and failed for C18, which stays `not_executed` (maximum of two attempts per cell reached). C19 then returned `sql_rejected` (`not_select`): a model answer, not an access error.
-- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: D rows of `model-question-comparison-en.csv`.
+- **Impact:** the 5 retries used the whole margin of operator D; 1 cell lost (C18), instructor fallback requested. Nature: real. Details per cell: D rows of `td1/model-question-comparison-en.csv`.
 
 ### D2 — Data fingerprints changed by Git line endings (operator D, before the run)
 
 - **Observed:** `check_access` stopped with "csv ... fingerprint differs from manifest.json".
-- **Cause:** Git (`core.autocrlf=true`) changed the line endings of the three CSV copies in `data/`.
+- **Cause:** Git (`core.autocrlf=true`) changed the line endings of the three CSV copies in `kit/data/`.
 - **Fix:** originals copied back from the kit, check passed again. The SQLite base was never modified (SHA-256 identical to `manifest.json`).
 - **Impact:** no model call consumed.
 
@@ -79,7 +79,7 @@ _HTTP status, `Retry-After`, timeouts, reallocations, fallback data used (label:
 
 - **Observed:** the first `--run` stopped before any API call with `csv product.csv, customers.csv, orders.csv -> fingerprint differs from manifest.json; get the kit again`. The working-copy CSV files were larger than in the kit (`customers.csv` 2219 bytes vs 2159, `orders.csv` 14352 vs 13954, `product.csv` 58 vs 52); `boutique.sqlite` was unchanged (53248 bytes).
 - **Cause:** after `git checkout anto` and `git merge origin/main`, Git for Windows (`core.autocrlf`) rewrote the text files with CRLF line endings; each size difference equals the file's number of lines.
-- **Fix:** restored the kit's original `data/*.csv`, `data/manifest.json` and `schema.sql`, and added `.gitattributes` (`data/** -text`, `*.sqlite binary`, `schema.sql -text`). The second run passed the local checks.
+- **Fix:** restored the kit's original `kit/data/*.csv`, `kit/data/manifest.json` and `schema.sql`, and added `.gitattributes` (`kit/data/** -text`, `*.sqlite binary`, `schema.sql -text`). The second run passed the local checks.
 - **Impact:** no API call consumed. The prompt is unaffected (the skeleton reads `schema.sql` in text mode, so line endings are normalised before hashing).
 
 Incidents D2 and E1 have the same cause; C met it too when cloning (fixed locally with `git config core.autocrlf false`). The `.gitattributes` added by E prevents it for everyone from now on.
