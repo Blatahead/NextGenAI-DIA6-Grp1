@@ -1,6 +1,6 @@
 {
   "date": "2026-10-14",
-  "statut": "Sélection mise à jour le 14/10/2026 : cinq modèles obligatoires, identifiants et paramètres pour le TD.",
+  "statut": "Sélection du 14/10/2026, cinq modèles tous accessibles le 20/10/2026 : une proposition, identifiants et paramètres pour le TD. Un autre modèle gratuit est admis s'il est documenté : identifiant exact et paramètres dans la configuration et dans la trace.",
   "source": "consigne-etudiante-en.md, sections 4 et 5",
   "groq": {
     "base_url": "https://api.groq.com/openai/v1",
