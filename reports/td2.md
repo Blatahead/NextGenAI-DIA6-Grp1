@@ -280,8 +280,8 @@ _To fill after 17:15._
 
 | Member | Pair | Work | Main files |
 |---|---|---|---|
-| Benjamin | A | `vote_k_sur_n`, driver `vote_td2.py`, tests, twenty-question comparison and commentary (Step 1) | `skeleton-multi-llm-en.py`, `vote_td2.py`, `voting-tests-en.csv`, `vote-comparison-td2.csv`, this section 1 |
-| Antonin | A | _to fill_ | |
+| Benjamin | A | Step 1 done together with Antonin on one computer (commits from Benjamin's account): `vote_k_sur_n`, driver `vote_td2.py`, tests, twenty-question comparison and commentary | `skeleton-multi-llm-en.py`, `vote_td2.py`, `voting-tests-en.csv`, `vote-comparison-td2.csv`, section 1 of this report |
+| Antonin | A | Step 1 done together with Benjamin on one computer (same work and files) | same as Benjamin |
 | Jean-Walter | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `wrong-consensus-td2.py`, `notes/td2-wrong-consensus-run.txt`, section 2 |
 | Noé | B | Step 2, done jointly: search of the shared wrong values in the 100 cells, 2-of-3 and 3-of-5 verdicts, SQL root cause of C10, row-level and customer-level delta on `data/boutique.sqlite`, independent checks (boundary fixture, partition invariant), empty-selection analysis of the shared 0, DEMO-VOTE; section 2 of this report | `wrong-consensus-td2.py`, `notes/td2-wrong-consensus-run.txt`, section 2 |
 | Emma | C | _to fill_ | |
