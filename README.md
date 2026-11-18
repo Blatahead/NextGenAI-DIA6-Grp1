@@ -76,7 +76,7 @@ _Exact commands actually run (per operator, with dates) are recorded in `notes/r
 
 | TD | Commit (full hash) | Report | Tag |
 |---|---|---|---|
-| TD 1 | _to fill_ | [`reports/td1.md`](reports/td1.md) | `td1-submission` |
+| TD 1 | `cad29357833f4de647db8197a11313f735699e7c` | [`reports/td1.md`](https://github.com/Blatahead/NextGenAI-DIA6-Grp1/blob/cad29357833f4de647db8197a11313f735699e7c/reports/td1.md) | `td1-submission` |
 | TD 2 | | | |
 | TD 3 | | | |
 
