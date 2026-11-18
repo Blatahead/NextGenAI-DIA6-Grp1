@@ -96,7 +96,37 @@ _To fill (Pair B: Jean-Walter, Noé): case identification (models, reference, 2-
 
 ## 3. Step 3 — The routing rule (Pair C)
 
-_To fill (Pair C: Emma, Bart): one-page rule per family with the TD 1 rates and the cheapest correct model, checking level per use (internal dashboard, customer-facing figure, payout), fallback, `RESOURCES` / `choose` adapted in `atelier-routage.py`, simulator outputs before and after, analysis of the priority in `choose`._
+Pair C (Emma and Bart) worked together on this step; everything is committed from Bart's branch. The one-page rule, with the TD 1 cells that justify each line, is [`routing-rule-td2.md`](../routing-rule-td2.md). The simulator outputs are `notes/routage-td2-before.jsonl` (kit rule, 7 scenarios) and `notes/routage-td2-after.jsonl` (our rule, the same 7 plus 5 added).
+
+### 3.1 What the TD 1 table says (observations)
+
+- On the **10 cells without an age filter** (period, product, both: C01, C03–C07, C12–C14, C20) all five models are correct. The cheapest route is enough: `gpt-oss-20b` on Groq Free (0; 0.075 / 0.30 USD per million tokens on-demand).
+- On the **10 age cells** (C02, C08–C11, C15–C19) only `gpt-oss-120b` is correct every time (10/10). `gpt-oss-20b` has 8/10 (wrong on C02 and C11), `qwen` 3/10, `dots` 2/10, `north-mini` 1/10. Every failure of every model in TD 1 is on an age question.
+- Where `gpt-oss-120b` and `gpt-oss-20b` returned the same value (8 age cells) it was correct; they differ on C02 and C11.
+- The votes of Step 1 do not fix age: the 2-of-3 panel has a wrong consensus on C09 and C10, the 3-of-5 quorum on C10 (section 1.4–1.5).
+
+### 3.2 The rule (summary, details in `routing-rule-td2.md`)
+
+| | No age | Age |
+|---|---|---|
+| First route | `gpt-oss-20b` Groq Free | `gpt-oss-120b` Groq Free (the only validated model) |
+| Unavailable | `north-mini`, `dots`, `qwen`, `gpt-oss-120b` (free) | no free substitute validated: wait, pay `gpt-oss-120b` on-demand, or abstain |
+| Dashboard | execution and value check | same, single `gpt-oss-120b` |
+| Customer figure | 2-of-3 quorum (`gpt-oss-20b`, `north-mini`, `dots`) | 2-of-2 `gpt-oss-120b` + `gpt-oss-20b`; disagreement goes to reference query and review |
+| Payout | reference query and human review | same |
+
+### 3.3 The simulator, before and after
+
+The seven kit scenarios keep their names. **The action of each scenario does not change** (run, run, defer, run, abstain, run, abstain); what changes is the resource, the cash cost and the check: for example `urgent` goes from the fictitious `senior-api` at 0.30 USD to `groq-gpt-oss-120b-ondemand` at 0.0006 USD, and `high impact` from "source verification and human review" to "reference query and human review". The kit rule used one numeric level per resource; ours uses the family validated by TD 1, so `unknown capability` now abstains because **no TD 1 cell validates the family**, not because a level is too low. Five scenarios were added: `customer figure`, `customer figure, age`, `provider down, simple` (goes to `north-mini`), `provider down, age` (abstains: no free substitute is validated for age) and `quota out, simple`.
+
+### 3.4 Priority in `choose`, and its limits
+
+Order of the decisions in our `choose`: (1) only resources validated on the request family; (2) included (free) capacity first, in the order of the rule; (3) a request that can wait defers to the refill of an included route; (4) otherwise the cheapest available paid route within the budget; (5) otherwise abstain. Included capacity is preferred to waiting, and waiting to paying, so an urgent age question pays 0.0006 USD while a deferrable one waits.
+
+- **Limit:** `choose` only names the check in `checks`; it does not run the quorum (that is `vote_k_sur_n`) or the reference query.
+- **Limit:** availability and budget (0.01 USD per request) are scenario inputs, not measurements; the delays (120 and 5 minutes) are assumptions.
+- **Hypothesis, not verified:** the 2-of-2 agreement between `gpt-oss-120b` and `gpt-oss-20b` rests on 10 age cells; a wrong agreement is possible, hence the reference query and review for payouts.
+- Twenty questions support a hypothesis for this batch, not a general error rate or a permanent ranking.
 
 ## 4. Plenary
 
@@ -110,8 +140,8 @@ _To fill after 17:15._
 | Antonin | A | _to fill_ | |
 | Jean-Walter | B | _to fill_ | |
 | Noé | B | _to fill_ | |
-| Emma | C | _to fill_ | |
-| Bart | C | _to fill_ | |
+| Emma | C | Step 3 done together with Bart: routing rule, simulator adaptation, section 3 (committed from Bart's branch) | `routing-rule-td2.md`, `atelier-routage.py`, `notes/routage-td2-before.jsonl`, `notes/routage-td2-after.jsonl`, this section 3 |
+| Bart | C | Step 3 done together with Emma: routing rule, simulator adaptation, section 3 | same files |
 
 ## 6. AI assistance
 
