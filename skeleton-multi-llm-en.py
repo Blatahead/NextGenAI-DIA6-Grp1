@@ -624,7 +624,39 @@ class Orchestrateur:
         families, and look in your traces for a case where several models agree
         on a wrong value.
         """
-        raise NotImplementedError("vote_k_sur_n: to implement in TD 2 (see the procedure in the docstring).")
+        # Implemented in TD 2 by DIA6 Group 1 (AI-assisted, see prompts-en.md).
+        def field(proposal, name):
+            return proposal.get(name) if isinstance(proposal, dict) else getattr(proposal, name, None)
+
+        n = len(traces_question)
+        # Rule 2: k must be a strict majority of the declared panel, n // 2 < k <= n.
+        if isinstance(k, bool) or not isinstance(k, int) or not (n // 2 < k <= n):
+            raise ValueError(f"k must be a strict majority of the panel: n // 2 < k <= n (n={n}, k={k})")
+
+        # Rule 3: one vote per (provider, model_requested); a duplicate is refused, not counted twice.
+        seen = set()
+        for proposal in traces_question:
+            key = (field(proposal, "provider"), field(proposal, "model_requested"))
+            if key in seen:
+                raise ValueError(f"duplicate proposal for {key[0]}:{key[1]}: a duplicate is not a second vote")
+            seen.add(key)
+
+        # Rule 1: only executed proposals carrying a value vote; errors stay in n without voting.
+        ballots: dict = {}
+        for proposal in traces_question:
+            value = field(proposal, "value")
+            if field(proposal, "verdict") != "executed" or value is None or value == "":
+                continue
+            value = int(value)                         # integer cents: 100 and "100" are the same vote
+            ballots.setdefault(value, []).append(f"{field(proposal, 'provider')}:{field(proposal, 'model_requested')}")
+
+        if not ballots:
+            return {"consensus": False, "value": None, "votes": 0, "models": []}
+        # With a strict majority, at most one value can reach k: no tie can be decided arbitrarily.
+        value, members = max(ballots.items(), key=lambda item: len(item[1]))
+        if len(members) >= k:                          # Rule 4
+            return {"consensus": True, "value": value, "votes": len(members), "models": members}
+        return {"consensus": False, "value": None, "votes": len(members), "models": []}   # Rule 5
 
 
 # ==========================================================================

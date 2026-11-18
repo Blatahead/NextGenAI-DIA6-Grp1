@@ -8,7 +8,7 @@ ESILV, *Next Generation AI / Trustworthy Generative AI* (Topic 1, D. Parisot). S
 
 | Member | Git branch | TD 1 role |
 |---|---|---|
-| Antonin Biron | `anto` | Operator E (Dots, OpenRouter account 2); shared repository; checked references C11–C20 |
+| Antonin _(full name)_ | `anto` | Operator E (Dots, OpenRouter account 2); shared repository; checked references C11–C20 |
 | Bart _(full name)_ | `bart` | Operator D with Emma (Qwen, Groq); wrote references C16–C20 |
 | Benjamin _(full name)_ | `ben` | Operator C (North Mini Code, OpenRouter account 1); checked references C01–C10; merged the common files |
 | Emma _(full name)_ | `emma` | Operator D with Bart (Qwen, Groq); wrote references C11–C15 |
@@ -41,6 +41,8 @@ TD 1 roles: A, B, C and E each ran one model (20 cells); Emma and Bart ran D tog
 | `prompts-en.md` | Experiment prompts verbatim + coding-assistance prompts | ours |
 | `notes/` | Run notes: allocation, quota counters, retries, longer explanations | ours |
 | `templates/` | Blank forms for TD 2 / TD 3 (routing rule, voting tests, costs, contributions) | kit |
+| `td2/` | **TD 2**: vote contract tests, decisions of the vote on the twenty questions (2-of-3 and 3-of-5), wrong-consensus analysis, routing rule, simulator outputs before/after | ours |
+| `topic2-symbolic-ai/` | Topic 2 (P. Bonnard, Symbolic AI): exercise notebooks, one folder per TP; separate course | ours (course notebooks) |
 | `reports/td1.md`, `td2.md`, `td3.md` | Session reports | ours |
 
 ## Reproduce
@@ -77,7 +79,7 @@ _Exact commands actually run (per operator, with dates) are recorded in `notes/r
 | TD | Commit (full hash) | Report | Tag |
 |---|---|---|---|
 | TD 1 | _to fill_ | [`reports/td1.md`](reports/td1.md) | `td1-submission` |
-| TD 2 | | | |
+| TD 2 | _to fill_ | [`reports/td2.md`](reports/td2.md) | `td2-submission` |
 | TD 3 | | | |
 
 ## Status
